@@ -1483,7 +1483,8 @@
   }
 
   /* 옆에서 본 안경 — 앞(렌즈)은 왼쪽, 안경다리(템플)·귀걸이는 오른쪽
-     렌즈 실루엣을 먼저 깔고 그 위에 림(테)을 얹어, 림 밖으로 나온 부분만 주황으로 남긴다. */
+     렌즈 실루엣을 먼저 깔고 그 위에 림(테)을 얹어, 림 밖으로 나온 부분만 주황으로 남긴다.
+     코받침은 얼굴 안쪽이므로 안경다리와 같은 오른쪽(뒤)으로 — 렌즈·림 뒤면에서 시작해 뒤로 뻗는다. */
   function sideArt(g, sx) {
     var isHorn = g.key === "horn";
     var rimPx = Math.max(3.4, g.rim * sx);          // 림 앞뒤 두께
@@ -1516,31 +1517,47 @@
       '<stop offset="0" stop-color="#ffe0a3"/><stop offset=".13" stop-color="#f6a70d"/><stop offset=".34" stop-color="#ffc352"/>' +
       '<stop offset=".5" stop-color="#f09b06"/><stop offset=".66" stop-color="#ffc352"/><stop offset=".87" stop-color="#f6a70d"/><stop offset="1" stop-color="#ffe0a3"/></linearGradient>' +
       '<clipPath id="' + clipId + '"><path d="' + lp + '"/></clipPath></defs>');
-
     /* 1) 림 밖으로 나온 렌즈 — 가장 먼저 깔고, 위에 림을 얹어 가린다 */
     if (g.prot > 0.05) {
       out.push('<path d="' + lp + '" fill="url(#lg-' + g.key + ')" stroke="#b26a04" stroke-width="0.8"/>');
     }
 
-    /* 2) 코받침 — 일체형 뿔테 패드 / 메탈 암 + 실리콘 패드 */
-    if (isHorn) {
-      out.push('<ellipse cx="' + f1(rxF - 2.5) + '" cy="' + f1(padCy) + '" rx="7.2" ry="10.5" fill="#5d6e83" stroke="#25303d" stroke-width="0.9"/>');
-      out.push('<path d="M' + f1(rxF - 6.4) + ' ' + f1(padCy - 6) + 'C' + f1(rxF - 7.6) + ' ' + f1(padCy) + ' ' + f1(rxF - 6.2) + ' ' + f1(padCy + 4.6) + ' ' + f1(rxF - 4.2) + ' ' + f1(padCy + 6.6) + '" fill="none" stroke="#cbd8e4" stroke-width="1.1" stroke-opacity=".35"/>');
-    } else {
-      out.push('<path d="M' + f1(rxF + 3.5) + ' ' + f1(padCy - 15) + 'L' + f1(rxF - 7.4) + ' ' + f1(padCy - 2) + '" fill="none" stroke="#8294a7" stroke-width="1.8" stroke-linecap="round"/>');
-      out.push('<ellipse cx="' + f1(rxF - 9) + '" cy="' + f1(padCy + 1.5) + '" rx="3.6" ry="8.2" fill="#dbe5ef" stroke="#71839a" stroke-width="0.9"/>');
-    }
-
-    /* 3) 림(테) — 앞뒤 두께 그대로. 가운데 구멍으로 렌즈 면이 보인다 */
+    /* 2) 림(테) — 앞뒤 두께 그대로. 가운데 구멍으로 렌즈 면이 보인다 */
     out.push('<rect x="' + f1(rxF) + '" y="' + f1(top) + '" width="' + f1(rimPx) + '" height="' + f1(hPx) + '" rx="' + f1(rod) + '" fill="url(#' + gradId + ')" stroke="' + edge + '" stroke-width="1"/>');
     out.push('<rect x="' + f1(holeX) + '" y="' + f1(holeY) + '" width="' + f1(holeW) + '" height="' + f1(holeH) + '" rx="' + f1(Math.min(holeW / 2, holeH / 2)) + '" fill="url(#' + holeId + ')" stroke="' + (isHorn ? "#1a2430" : "#8393a6") + '" stroke-width="0.7" stroke-opacity=".55"/>');
     // 렌즈 면 하이라이트
     out.push('<rect x="' + f1(holeX + holeW * 0.22) + '" y="' + f1(holeY + holeH * 0.12) + '" width="' + f1(Math.max(0.8, holeW * 0.2)) + '" height="' + f1(holeH * 0.5) + '" rx="' + f1(Math.max(0.4, holeW * 0.1)) + '" fill="#ffffff" fill-opacity=".5"/>');
 
-    /* 4) 림 끝선 — 어디까지가 림이고 어디부터 나온 부분인지 */
+    /* 3) 림 끝선 — 어디까지가 림이고 어디부터 나온 부분인지 */
     if (g.prot > 0.05) {
       out.push('<line x1="' + f1(rxF) + '" y1="' + f1(top + 1.4) + '" x2="' + f1(rxF) + '" y2="' + f1(bot - 1.4) + '" stroke="#a96303" stroke-width="0.8" stroke-opacity=".7"/>');
       out.push('<line x1="' + f1(rxB) + '" y1="' + f1(top + 1.4) + '" x2="' + f1(rxB) + '" y2="' + f1(bot - 1.4) + '" stroke="#a96303" stroke-width="0.8" stroke-opacity=".7"/>');
+    }
+
+    /* 4) 코받침 — 얼굴 안쪽이므로 안경다리와 같은 오른쪽(뒤)으로. 뿔테는 림에 이어진 일체형, 메탈테는 암 + 실리콘 패드 */
+    if (isHorn) {
+      var hr = Math.min(hPx * 0.21, Math.max(0, (bot - 2.5 - padCy)));   // 일체형 패드 세로 반경(림 아래로 삐져나오지 않게)
+      var px0 = rxB;                                       // 림 뒤면
+      var hTop = f1(px0 - 3) + ' ' + f1(padCy - hr);
+      var hOut = 'C' + f1(px0 + 3) + ' ' + f1(padCy - hr * 1.02) + ' ' + f1(px0 + 6.6) + ' ' + f1(padCy - hr * 0.6) + ' ' + f1(px0 + 7.2) + ' ' + f1(padCy - hr * 0.02) +
+                 'C' + f1(px0 + 7.8) + ' ' + f1(padCy + hr * 0.58) + ' ' + f1(px0 + 3) + ' ' + f1(padCy + hr * 1.02) + ' ' + f1(px0 - 3) + ' ' + f1(padCy + hr);
+      /* 림과 이어진 채로 뒤로 볼록하게 — 안쪽 이음선은 그리지 않는다 */
+      out.push('<path d="M' + hTop + hOut + 'Z" fill="#48596e"/>');
+      out.push('<path d="M' + hTop + hOut + '" fill="none" stroke="#141d27" stroke-width="0.85" stroke-linecap="round"/>');
+      /* 패드 뒤면 하이라이트 */
+      out.push('<path d="M' + f1(px0 + 4.2) + ' ' + f1(padCy - hr * 0.6) + 'C' + f1(px0 + 5.8) + ' ' + f1(padCy - hr * 0.16) + ' ' + f1(px0 + 5.8) + ' ' + f1(padCy + hr * 0.22) + ' ' + f1(px0 + 4.4) + ' ' + f1(padCy + hr * 0.56) + '" fill="none" stroke="#9fb0c4" stroke-width="1.2" stroke-opacity=".28" stroke-linecap="round"/>');
+    } else {
+      var mRy = Math.max(6.4, Math.min(8.6, hPx * 0.15));
+      var e0 = Math.max(rxB, lxB);                          // 렌즈(또는 림) 뒤면 — 코받침은 여기서 조금만 나온다
+      var pCx = e0 + 3.6, pCy = padCy + mRy * 0.42;
+      out.push('<path d="M' + f1(e0 - 1) + ' ' + f1(padCy - mRy * 1.3) +
+        'L' + f1(pCx + 0.3) + ' ' + f1(padCy + mRy * 0.1) +
+        '" fill="none" stroke="#7d8fa3" stroke-width="2.4" stroke-linecap="round"/>');
+      out.push('<g transform="rotate(-5 ' + f1(pCx) + ' ' + f1(pCy) + ')">' +
+        '<rect x="' + f1(pCx - 3.1) + '" y="' + f1(pCy - mRy * 1.0) + '" width="6.2" height="' + f1(mRy * 2) + '" rx="3.1" fill="#dfe8f1" stroke="#70829a" stroke-width="0.85"/>' +
+        '<path d="M' + f1(pCx - 1.4) + ' ' + f1(pCy - mRy * 0.82) + 'C' + f1(pCx - 1.9) + ' ' + f1(pCy) + ' ' + f1(pCx - 1.7) + ' ' + f1(pCy + mRy * 0.56) + ' ' + f1(pCx - 1.2) + ' ' + f1(pCy + mRy * 0.82) + '" fill="none" stroke="#ffffff" stroke-width="0.95" stroke-opacity=".85"/>' +
+        '<path d="M' + f1(pCx + 1.1) + ' ' + f1(pCy - mRy * 0.82) + 'L' + f1(pCx + 1.1) + ' ' + f1(pCy + mRy * 0.82) + '" fill="none" stroke="#9fb0c4" stroke-width="0.6" stroke-opacity=".5"/>' +
+        '</g>');
     }
 
     /* 5) 엔드피스 · 힌지 · 템플(안경다리) · 귀걸이 */
