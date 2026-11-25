@@ -1,0 +1,1834 @@
+<!doctype html>
+<html lang="ko">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="theme-color" content="#0b2b47">
+<title>10초 렌즈 압축 &amp; 안경테 추천 계산기 | 안경사 실전 기준</title>
+<meta name="description" content="근시·원시·난시 도수와 테 형태를 넣으면 추천 굴절률(1.56/1.60/1.67/1.74), 렌즈 설계 4단계(구면·비구면·양면비구면·프리폼) 비교, 테별 주의사항을 10초 만에 정리해 드립니다. 안경사 17년 실전 기준.">
+<!--
+  ============================================================
+  10초 렌즈 압축 & 안경테 추천 계산기
+  - 단일 파일 / 외부 CDN·폰트·이미지 의존 없음 (오프라인 실행 가능)
+  - 수익화 자리: 하단 .partner 섹션 (쿠팡 파트너스)
+  ============================================================
+-->
+<style>
+  :root{
+    --bg:#f4f6f9;
+    --card:#ffffff;
+    --ink:#101828;
+    --ink-2:#475467;
+    --ink-3:#8b95a5;
+    --line:#e4e8ee;
+    --line-2:#eef1f5;
+    --brand:#0f5ea8;
+    --brand-deep:#0b2b47;
+    --brand-soft:#eaf2fb;
+    --teal:#0e8a7d;
+    --teal-soft:#e7f6f3;
+    --warn:#b54708;
+    --warn-bg:#fff8ec;
+    --warn-line:#f5d7ae;
+    --radius:18px;
+    --shadow:0 1px 2px rgba(16,24,40,.04), 0 10px 28px -22px rgba(16,24,40,.45);
+    font-synthesis:none;
+  }
+  *,*::before,*::after{box-sizing:border-box}
+  html{-webkit-text-size-adjust:100%}
+  body{
+    margin:0;
+    background:var(--bg);
+    color:var(--ink);
+    font-family:-apple-system,BlinkMacSystemFont,"Apple SD Gothic Neo","Malgun Gothic","맑은 고딕","Noto Sans KR","Noto Sans CJK KR","Segoe UI",Roboto,sans-serif;
+    font-size:16px;
+    line-height:1.55;
+    letter-spacing:-0.01em;
+    word-break:keep-all;
+    overflow-wrap:anywhere;
+  }
+  .wrap{width:100%;max-width:1060px;margin:0 auto;padding:0 16px}
+
+  /* ---------- header ---------- */
+  .hero{
+    background:
+      radial-gradient(120% 140% at 92% -10%, rgba(64,182,214,.35) 0%, rgba(64,182,214,0) 55%),
+      linear-gradient(158deg,#08243c 0%,#0d4a80 58%,#0a6a96 100%);
+    color:#fff;
+    padding:26px 0 80px;
+  }
+  .hero-eyebrow{
+    display:inline-flex;align-items:center;gap:7px;
+    margin:0 0 12px;
+    padding:5px 11px 5px 9px;
+    border-radius:999px;
+    background:rgba(255,255,255,.13);
+    border:1px solid rgba(255,255,255,.22);
+    font-size:12px;font-weight:600;letter-spacing:.01em;color:#dff1fb;
+  }
+  .hero-eyebrow svg{width:15px;height:15px;flex:none}
+  .hero h1{
+    margin:0 0 10px;
+    font-size:clamp(23px,5.2vw,33px);
+    line-height:1.28;
+    letter-spacing:-0.035em;
+    font-weight:800;
+  }
+  .hero h1 span{color:#8fd8f0}
+  .hero p{
+    margin:0;max-width:44ch;
+    font-size:14.5px;line-height:1.65;color:#c9dcec;
+  }
+  .hero p b{color:#fff;font-weight:700}
+
+  /* ---------- layout ---------- */
+  .layout{
+    display:grid;gap:14px;
+    margin-top:-58px;
+    padding-bottom:26px;
+  }
+  @media (min-width:980px){
+    .layout{
+      grid-template-columns:minmax(0,432px) minmax(0,1fr);
+      gap:18px;align-items:start;
+      margin-top:-58px;padding-bottom:34px;
+    }
+  }
+  .panel{
+    background:var(--card);
+    border:1px solid var(--line);
+    border-radius:var(--radius);
+    box-shadow:var(--shadow);
+    padding:18px 16px;
+    min-width:0;
+  }
+  @media (min-width:600px){ .panel{padding:22px 20px} }
+  .panel + .panel{margin-top:0}
+
+  /* ---------- inputs ---------- */
+  .panel-title{
+    display:flex;align-items:baseline;justify-content:space-between;gap:10px;
+    margin:0 0 4px;
+  }
+  .panel-title h2{margin:0;font-size:16px;font-weight:800;letter-spacing:-0.02em}
+  .panel-title span{font-size:12px;color:var(--ink-3)}
+  .field{padding:16px 0;border-top:1px solid var(--line-2)}
+  .field:first-of-type{border-top:0;padding-top:6px}
+  .field-head{display:flex;align-items:center;justify-content:space-between;gap:10px;margin-bottom:10px}
+  .field-head label,.field-head .label{font-size:14px;font-weight:700;color:var(--ink)}
+  .field-head .label-sub{display:block;font-size:11.5px;font-weight:500;color:var(--ink-3);letter-spacing:0}
+  .value-box{
+    display:inline-flex;align-items:center;gap:2px;
+    padding:5px 11px;border-radius:10px;
+    background:var(--brand-soft);color:#0b4a86;
+    font-size:15px;font-weight:800;letter-spacing:-0.02em;
+    font-variant-numeric:tabular-nums;
+    white-space:nowrap;
+  }
+  .value-box small{font-size:11px;font-weight:700;opacity:.7;margin-left:2px}
+
+  .step-row{display:flex;align-items:center;gap:7px}
+  .step-btn{
+    flex:none;min-width:59px;height:46px;padding:0 7px;border-radius:12px;
+    border:1px solid #d5dce6;background:#fff;color:#0b4a86;
+    font:inherit;line-height:1;cursor:pointer;
+    display:inline-flex;align-items:center;justify-content:center;gap:1px;
+    touch-action:manipulation;-webkit-tap-highlight-color:transparent;
+    transition:background .15s,border-color .15s,box-shadow .15s,opacity .15s;
+    user-select:none;
+  }
+  .step-btn b{
+    font-size:12.5px;font-weight:800;letter-spacing:-0.04em;
+    font-variant-numeric:tabular-nums;
+  }
+  .step-btn small{font-size:9.5px;font-weight:700;color:var(--ink-3);margin-left:1px}
+  .step-btn:hover{background:#f5f9ff;border-color:#9cc4e8}
+  .step-btn:active{background:#e6f1fd;border-color:#6fa8dc;box-shadow:inset 0 1px 3px rgba(15,94,168,.16)}
+  .step-btn:focus-visible{outline:2px solid #9cc4e8;outline-offset:2px}
+  .step-btn:disabled{
+    opacity:.4;cursor:not-allowed;background:#f6f8fb;border-color:var(--line);
+    color:var(--ink-3);box-shadow:none;
+  }
+  .step-btn:disabled small{opacity:.8}
+
+  input[type="range"]{
+    -webkit-appearance:none;appearance:none;
+    flex:1 1 auto;min-width:0;width:100%;
+    height:34px;margin:0;background:transparent;cursor:pointer;
+  }
+  input[type="range"]::-webkit-slider-runnable-track{
+    height:6px;border-radius:99px;background:#e6eaf0;
+  }
+  input[type="range"]::-webkit-slider-thumb{
+    -webkit-appearance:none;appearance:none;
+    width:24px;height:24px;margin-top:-9px;border-radius:50%;
+    background:#fff;border:3px solid var(--brand);
+    box-shadow:0 1px 4px rgba(16,24,40,.28);
+  }
+  input[type="range"]::-moz-range-track{height:6px;border-radius:99px;background:#e6eaf0}
+  input[type="range"]::-moz-range-thumb{
+    width:18px;height:18px;border-radius:50%;background:#fff;
+    border:3px solid var(--brand);box-shadow:0 1px 4px rgba(16,24,40,.28);
+  }
+  input[type="range"]:focus-visible{outline:2px solid #9cc4e8;outline-offset:4px;border-radius:99px}
+
+  .scale-row{
+    display:flex;justify-content:space-between;gap:8px;
+    margin:2px 0 10px;font-size:11px;color:var(--ink-3);font-weight:600;
+  }
+  .chips{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:6px}
+  .chip{
+    appearance:none;-webkit-appearance:none;
+    border:1px solid var(--line);background:#fff;
+    color:var(--ink-2);font:inherit;font-size:12.5px;font-weight:700;
+    letter-spacing:-0.01em;font-variant-numeric:tabular-nums;
+    padding:8px 6px;border-radius:999px;cursor:pointer;text-align:center;
+    transition:background .15s,border-color .15s,color .15s;
+    white-space:nowrap;
+  }
+  .chip:hover{border-color:#c7d2df;background:#fafbfd}
+  .chip[aria-pressed="true"]{
+    background:#0f5ea8;border-color:#0f5ea8;color:#fff;
+  }
+  .chip[aria-pressed="true"]:hover{background:#0d5396}
+
+  /* frame cards */
+  .frame-grid{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:7px}
+  .frame-card{
+    position:relative;display:block;cursor:pointer;
+    border:1.5px solid var(--line);border-radius:14px;
+    background:#fff;padding:11px 8px 10px;text-align:center;
+    transition:border-color .15s,background .15s,box-shadow .15s;
+  }
+  .frame-card:hover{border-color:#c7d2df}
+  .frame-card input{position:absolute;opacity:0;pointer-events:none}
+  .frame-card svg{display:block;width:100%;height:26px;margin:0 auto 6px;color:#7d8a9a}
+  .frame-card .fc-name{display:block;font-size:12.5px;font-weight:800;line-height:1.3;letter-spacing:-0.03em;color:var(--ink)}
+  .frame-card .fc-sub{display:block;margin-top:2px;font-size:10.5px;font-weight:600;line-height:1.35;color:var(--ink-3);letter-spacing:-0.02em}
+  .frame-card:has(input:checked){
+    border-color:var(--brand);background:#f6faff;
+    box-shadow:0 0 0 3px rgba(15,94,168,.09);
+  }
+  .frame-card:has(input:checked) svg{color:var(--brand)}
+  .frame-card:has(input:focus-visible){outline:2px solid #9cc4e8;outline-offset:2px}
+
+  .size-grid{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:7px}
+  .size-card{
+    position:relative;display:block;cursor:pointer;
+    border:1.5px solid var(--line);border-radius:14px;background:#fff;
+    padding:10px 6px;text-align:center;
+    transition:border-color .15s,background .15s,box-shadow .15s;
+  }
+  .size-card input{position:absolute;opacity:0;pointer-events:none}
+  .size-dot{
+    display:block;height:22px;margin:0 auto 6px;
+    display:flex;align-items:center;justify-content:center;
+  }
+  .size-dot i{display:block;border:2.5px solid #97a4b4;border-radius:50% 50% 46% 46% / 44% 44% 56% 56%}
+  .size-card .sc-name{display:block;font-size:12.5px;font-weight:800;letter-spacing:-0.03em}
+  .size-card .sc-mm{display:block;font-size:10.5px;font-weight:600;color:var(--ink-3);margin-top:1px}
+  .size-card:has(input:checked){
+    border-color:var(--brand);background:#f6faff;
+    box-shadow:0 0 0 3px rgba(15,94,168,.09);
+  }
+  .size-card:has(input:checked) i{border-color:var(--brand)}
+  .size-card:has(input:focus-visible){outline:2px solid #9cc4e8;outline-offset:2px}
+
+  .hint{
+    margin:10px 0 0;padding:9px 11px;border-radius:10px;
+    background:#f7f9fc;border:1px solid var(--line-2);
+    font-size:11.5px;line-height:1.55;color:var(--ink-2);
+  }
+  .hint b{color:var(--ink)}
+
+  /* ---------- results ---------- */
+  .results{padding:0;overflow:hidden}
+  .verdict{
+    padding:18px 16px 16px;
+    background:linear-gradient(160deg,#0c3660 0%,#0f5ea8 62%,#1174ae 100%);
+    color:#fff;
+  }
+  @media (min-width:600px){ .verdict{padding:22px 22px 20px} }
+  .verdict-top{display:flex;align-items:center;justify-content:space-between;gap:10px;flex-wrap:wrap}
+  .verdict-top .tag{
+    font-size:11.5px;font-weight:700;letter-spacing:.02em;
+    color:#c9e4f7;text-transform:none;
+  }
+  .verdict-top .badge{
+    display:inline-flex;align-items:center;gap:5px;
+    padding:4px 9px;border-radius:999px;
+    background:rgba(255,255,255,.15);border:1px solid rgba(255,255,255,.26);
+    font-size:11px;font-weight:700;color:#eaf6ff;white-space:nowrap;
+  }
+  .verdict-main{display:flex;align-items:flex-end;gap:10px;margin:6px 0 2px;flex-wrap:wrap}
+  .verdict-main strong{
+    font-size:clamp(40px,11vw,52px);line-height:1;font-weight:800;
+    letter-spacing:-0.05em;font-variant-numeric:tabular-nums;
+  }
+  .verdict-main .vm-side{padding-bottom:5px}
+  .verdict-main .vm-side b{display:block;font-size:14.5px;font-weight:800;letter-spacing:-0.02em}
+  .verdict-main .vm-side span{display:block;font-size:11.5px;color:#bcdcf1;font-weight:600}
+  .verdict p{margin:8px 0 0;font-size:13px;line-height:1.6;color:#d5e8f6}
+  .verdict p b{color:#fff}
+  .gauge{margin-top:14px}
+  .gauge-head{display:flex;justify-content:space-between;font-size:11px;font-weight:700;color:#cfe5f4;margin-bottom:5px}
+  .gauge-track{height:8px;border-radius:99px;background:rgba(255,255,255,.18);overflow:hidden}
+  .gauge-fill{height:100%;border-radius:99px;background:linear-gradient(90deg,#7ce0c8,#ffd166 55%,#ff8a5c);transition:width .35s ease}
+
+  .stats{
+    display:grid;grid-template-columns:repeat(2,minmax(0,1fr));
+    border-bottom:1px solid var(--line-2);
+  }
+  .stat{padding:13px 16px;border-bottom:1px solid var(--line-2);min-width:0}
+  .stat:nth-child(odd){border-right:1px solid var(--line-2)}
+  .stat:nth-last-child(-n+2){border-bottom:0}
+  .stat .k{display:block;font-size:11px;font-weight:700;color:var(--ink-3);letter-spacing:0}
+  .stat .v{display:block;margin-top:3px;font-size:16px;font-weight:800;letter-spacing:-0.03em;font-variant-numeric:tabular-nums}
+  .stat .v small{font-size:11px;font-weight:700;color:var(--ink-3);margin-left:3px;letter-spacing:0}
+
+  .block{padding:16px;border-bottom:1px solid var(--line-2)}
+  @media (min-width:600px){ .block{padding:18px 22px} }
+  .block:last-child{border-bottom:0}
+  .block h3{
+    margin:0 0 9px;font-size:13.5px;font-weight:800;letter-spacing:-0.02em;
+    display:flex;align-items:center;gap:7px;
+  }
+  .block h3::before{
+    content:"";width:3px;height:13px;border-radius:2px;background:var(--brand);flex:none;
+  }
+  .block ul{margin:0;padding:0;list-style:none}
+  .block ul li{
+    position:relative;padding-left:15px;margin:0 0 7px;
+    font-size:13px;line-height:1.62;color:var(--ink-2);
+  }
+  .block ul li:last-child{margin-bottom:0}
+  .block ul li::before{
+    content:"";position:absolute;left:2px;top:8px;
+    width:5px;height:5px;border-radius:50%;background:#b9c6d4;
+  }
+  .block ul li b{color:var(--ink);font-weight:700}
+  .block ul li .num{font-variant-numeric:tabular-nums;font-weight:700;color:#0b4a86}
+
+  .risk{
+    margin:0;padding:0 16px 16px;
+  }
+  @media (min-width:600px){ .risk{padding:0 22px 18px} }
+  .risk-box{
+    border:1px solid var(--warn-line);background:var(--warn-bg);
+    border-radius:12px;padding:12px 13px;
+  }
+  .risk-box .rt{
+    display:flex;align-items:center;gap:6px;
+    font-size:12px;font-weight:800;color:var(--warn);margin-bottom:5px;
+  }
+  .risk-box .rt svg{width:15px;height:15px;flex:none}
+  .risk-box p{margin:0;font-size:12.5px;line-height:1.62;color:#7a4a12}
+  .risk-box p + p{margin-top:6px}
+
+  .actions{padding:0 16px 18px;display:flex;gap:8px;flex-wrap:wrap}
+  @media (min-width:600px){ .actions{padding:0 22px 20px} }
+  .btn{
+    appearance:none;-webkit-appearance:none;font:inherit;cursor:pointer;
+    display:inline-flex;align-items:center;justify-content:center;gap:7px;
+    padding:11px 16px;border-radius:12px;font-size:13px;font-weight:700;
+    border:1px solid var(--line);background:#fff;color:var(--ink-2);
+    transition:background .15s,border-color .15s;
+  }
+  .btn:hover{background:#f7f9fc;border-color:#cfd6e0}
+  .btn.primary{background:#0f5ea8;border-color:#0f5ea8;color:#fff;flex:1 1 auto}
+  .btn.primary:hover{background:#0d5396}
+  .btn svg{width:15px;height:15px;flex:none}
+
+  .disclaimer{
+    margin:0;padding:0 16px 18px;
+    font-size:11px;line-height:1.6;color:var(--ink-3);
+  }
+  @media (min-width:600px){ .disclaimer{padding:0 22px 20px} }
+
+  /* ---------- 설계 4단계 비교 ---------- */
+  .dc-intro{margin:0 0 11px;font-size:12px;line-height:1.6;color:var(--ink-3)}
+  .dc-intro b{color:#0b4a86;font-weight:800}
+  .dc-grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:8px}
+  @media (min-width:640px){ .dc-grid{gap:10px} }
+  .dc-card{
+    position:relative;min-width:0;
+    border:1.5px solid var(--line);border-radius:13px;background:#fff;
+    padding:10px 10px 9px;
+    transition:border-color .15s,background .15s;
+  }
+  .dc-card.is-pick{
+    border-color:var(--brand);background:#f7fbff;
+    box-shadow:0 0 0 3px rgba(15,94,168,.08);
+  }
+  .dc-top{display:flex;align-items:center;justify-content:space-between;gap:6px;min-height:19px;margin-bottom:2px}
+  .dc-step{font-size:9.5px;font-weight:800;letter-spacing:.02em;color:var(--ink-3)}
+  .dc-card.is-pick .dc-step{color:#5a7fa3}
+  .dc-pick{
+    display:inline-flex;align-items:center;
+    padding:2px 6px;border-radius:999px;background:var(--brand);color:#fff;
+    font-size:9.5px;font-weight:800;letter-spacing:-0.01em;white-space:nowrap;
+  }
+  .dc-card h4{margin:0;font-size:13px;font-weight:800;letter-spacing:-0.035em;line-height:1.25;color:var(--ink)}
+  .dc-card.is-pick h4{color:#0b4a86}
+  .dc-sub{margin:2px 0 8px;font-size:10px;font-weight:600;line-height:1.4;color:var(--ink-3);letter-spacing:-0.02em}
+  .dc-metrics{margin:0;padding:0;list-style:none}
+  .block ul.dc-metrics li{display:flex;align-items:center;gap:6px;margin:0 0 5px;padding-left:0}
+  .block ul.dc-metrics li::before{content:none}
+  .dc-metrics li:last-child{margin-bottom:0}
+  .dc-k{flex:none;width:48px;font-size:10px;font-weight:700;color:var(--ink-2);letter-spacing:-0.03em;white-space:nowrap}
+  .dc-bar{display:flex;gap:2px;flex:1 1 auto;min-width:0}
+  .dc-bar i{flex:1 1 0;height:6px;border-radius:2px;background:#e6eaf0}
+  .dc-bar i.on{background:#8fb3d2}
+  .dc-bar i.burden.on{background:#e8b464}
+  .dc-card.is-pick .dc-bar i.on{background:var(--brand)}
+  .dc-card.is-pick .dc-bar i.burden.on{background:#d99a3f}
+  .dc-note{
+    margin:8px 0 0;padding-top:7px;border-top:1px dashed var(--line);
+    font-size:10px;font-weight:600;line-height:1.5;color:var(--ink-3);letter-spacing:-0.02em;
+    min-height:30px;
+  }
+  .dc-card.is-pick .dc-note{color:#0b4a86}
+  .dc-legend{margin:10px 0 0;font-size:10.5px;line-height:1.6;color:var(--ink-3)}
+  .dc-legend b{color:var(--ink-2);font-weight:700}
+  @media (min-width:640px){
+    .dc-k{width:56px;font-size:10.5px}
+    .dc-sub{font-size:10.5px}
+    .dc-note{font-size:10.5px}
+  }
+
+  /* ---------- 옆면 두께 & 테 장착 비교 ---------- */
+  .sc-intro{margin:0 0 10px;font-size:12px;line-height:1.62;color:var(--ink-2)}
+  .sc-intro b{color:#0b4a86;font-weight:800}
+  .sc-grid{display:grid;grid-template-columns:1fr;gap:8px}
+  @media (min-width:560px){ .sc-grid{grid-template-columns:repeat(2,minmax(0,1fr))} }
+  @media (min-width:640px){ .sc-grid{grid-template-columns:repeat(2,minmax(0,312px));justify-content:center;gap:10px} }
+  .sc-card{
+    min-width:0;border:1.5px solid var(--line);border-radius:13px;
+    background:#fff;padding:9px 8px 9px;
+  }
+  .sc-card.is-metal{background:#fbfcfe}
+  .sc-head{display:flex;align-items:baseline;justify-content:space-between;gap:5px}
+  .sc-name{font-size:11.5px;font-weight:800;letter-spacing:-0.035em;white-space:nowrap;color:var(--ink)}
+  .sc-rim{font-size:9.5px;font-weight:700;color:var(--ink-3);white-space:nowrap;letter-spacing:-0.02em}
+  .sc-svg{display:block;width:100%;height:auto;margin:3px 0 5px;overflow:visible}
+  .sc-badge{
+    display:flex;align-items:baseline;justify-content:space-between;gap:4px;
+    padding:5px 7px;border-radius:9px;
+    background:#fff8ee;border:1px solid #f7d9b0;
+  }
+  .sc-badge .k{font-size:9.5px;font-weight:800;color:#9a5b12;letter-spacing:-0.03em;white-space:nowrap}
+  .sc-badge .v{
+    font-size:13px;font-weight:800;color:#b45309;letter-spacing:-0.03em;
+    font-variant-numeric:tabular-nums;white-space:nowrap;
+  }
+  .sc-badge .v small{font-size:9px;font-weight:700;margin-left:1px}
+  .sc-badge.is-zero{background:#f4f7fa;border-color:#e3e9f0}
+  .sc-badge.is-zero .k{color:var(--ink-3)}
+  .sc-badge.is-zero .v{color:var(--ink-2)}
+  .sc-sub{margin:6px 0 0;font-size:9.5px;line-height:1.5;color:var(--ink-3);letter-spacing:-0.03em}
+  .sc-legend{display:flex;flex-wrap:wrap;gap:4px 12px;margin:10px 0 0;font-size:10px;color:var(--ink-3);line-height:1.5}
+  .sc-legend span{display:inline-flex;align-items:center;gap:4px}
+  .sc-legend i{width:10px;height:10px;border-radius:3px;display:block;flex:none}
+  .sc-legend .sc-scale{color:#a6b0bd;font-size:9.5px}
+  .sc-note{margin:9px 0 0;padding-top:8px;border-top:1px dashed var(--line);font-size:10.5px;line-height:1.58;color:var(--ink-3)}
+  .sc-note b{color:var(--ink-2);font-weight:700}
+  @media (min-width:640px){
+    .sc-svg{max-width:296px;margin-left:auto;margin-right:auto}
+    .sc-name{font-size:12.5px}
+    .sc-rim{font-size:10.5px}
+    .sc-badge .k{font-size:10.5px}
+    .sc-badge .v{font-size:15px}
+    .sc-sub{font-size:10.5px}
+    .sc-legend{font-size:10.5px}
+    .sc-note{font-size:11px}
+  }
+
+  /* ---------- PD 입력 ---------- */
+  .pd-field{margin-top:15px;padding-top:14px;border-top:1px dashed #dfe5ec}
+  .pd-field label{font-size:14px;font-weight:700;color:var(--ink)}
+  .chips-3{grid-template-columns:repeat(3,minmax(0,1fr))}
+  @media (min-width:600px){ .chips-3{grid-template-columns:repeat(6,minmax(0,1fr))} }
+  .pd-hint{margin:10px 0 0;font-size:11px;line-height:1.58;color:var(--ink-3)}
+  .pd-hint b{color:var(--ink-2);font-weight:700}
+
+  /* ---------- 편심 · 테 크기별 비교 ---------- */
+  .cmp{margin-top:11px;border:1px solid var(--line);border-radius:12px;overflow:hidden;background:#fff}
+  .cmp-head,.cmp-row{display:grid;grid-template-columns:minmax(0,1fr) 47px 54px 55px;gap:3px;align-items:center;padding:8px 9px}
+  .cmp-head{background:#f7f9fc;border-bottom:1px solid var(--line);font-size:9.5px;font-weight:800;color:var(--ink-3);letter-spacing:-0.03em}
+  .cmp-head span:not(:first-child){text-align:right}
+  .cmp-row{position:relative;border-bottom:1px solid var(--line-2)}
+  .cmp-row:last-child{border-bottom:0}
+  .cmp-row .cn{font-size:11.5px;font-weight:800;letter-spacing:-0.035em;color:var(--ink);line-height:1.25}
+  .cmp-row .cn small{display:block;margin-top:1px;font-size:9.5px;font-weight:600;color:var(--ink-3);letter-spacing:0}
+  .cmp-row .cv{text-align:right;font-size:11.5px;font-weight:800;color:var(--ink-2);letter-spacing:-0.03em;font-variant-numeric:tabular-nums;line-height:1.25}
+  .cmp-row .cv small{font-size:9px;font-weight:700;color:var(--ink-3);margin-left:1px;letter-spacing:0}
+  .cmp-row.is-now{background:#f2f8ff}
+  .cmp-row.is-now::before{content:"";position:absolute;left:0;top:0;bottom:0;width:3px;background:var(--brand)}
+  .cmp-row.is-now .cn,.cmp-row.is-now .cv{color:#0b4a86}
+  .cmp-row.is-now .cn small{color:#5a86ad}
+  .cmp-note{margin:9px 0 0;font-size:10.5px;line-height:1.6;color:var(--ink-3)}
+  .cmp-note b{color:var(--ink-2);font-weight:700}
+  @media (min-width:600px){
+    .cmp-head,.cmp-row{grid-template-columns:minmax(0,1fr) 62px 68px 68px;padding:9px 12px}
+    .cmp-head{font-size:10.5px}
+    .cmp-row .cn{font-size:12.5px}
+    .cmp-row .cv{font-size:13px}
+    .cmp-note{font-size:11px}
+  }
+
+  /* ---------- partner (monetization) ---------- */
+  .partner{padding:6px 0 40px}
+  .partner-head{display:flex;align-items:baseline;justify-content:space-between;gap:12px;margin:0 2px 10px;flex-wrap:wrap}
+  .partner-head h2{margin:0;font-size:15px;font-weight:800;letter-spacing:-0.02em}
+  .partner-head p{margin:0;font-size:11.5px;color:var(--ink-3)}
+  .partner-grid{display:grid;gap:10px;grid-template-columns:1fr}
+  @media (min-width:720px){ .partner-grid{grid-template-columns:repeat(3,minmax(0,1fr));gap:12px} }
+  .p-card{
+    display:flex;gap:12px;align-items:stretch;
+    background:#fff;border:1px solid var(--line);border-radius:16px;
+    padding:12px;box-shadow:0 1px 2px rgba(16,24,40,.03);
+    text-decoration:none;color:inherit;min-width:0;
+    transition:border-color .15s,box-shadow .15s;
+  }
+  .p-card:hover{border-color:#c7d2df;box-shadow:0 6px 18px -14px rgba(16,24,40,.4)}
+  .p-thumb{
+    flex:none;width:76px;border-radius:11px;
+    background:linear-gradient(145deg,#eef3f8,#dfe8f1);
+    display:flex;align-items:center;justify-content:center;
+    color:#9aa9ba;font-size:10px;font-weight:700;text-align:center;line-height:1.3;
+  }
+  .p-thumb svg{width:26px;height:26px}
+  .p-body{min-width:0;display:flex;flex-direction:column;gap:3px;justify-content:center}
+  .p-cat{font-size:10px;font-weight:800;letter-spacing:.04em;color:#0f5ea8}
+  .p-name{font-size:13.5px;font-weight:800;line-height:1.35;letter-spacing:-0.02em;margin:0}
+  .p-desc{font-size:11.5px;line-height:1.45;color:var(--ink-3);margin:0}
+  .p-link{margin-top:3px;font-size:11.5px;font-weight:800;color:#0f5ea8}
+  .p-link::after{content:" →"}
+  .partner-note{
+    margin:10px 2px 0;font-size:10.5px;line-height:1.6;color:var(--ink-3);
+  }
+  .partner-note b{color:var(--ink-2)}
+
+  /* ---------- footer ---------- */
+  .site-footer{border-top:1px solid var(--line);background:#fff;padding:18px 0 26px}
+  .site-footer p{margin:0;font-size:11px;line-height:1.65;color:var(--ink-3)}
+  .site-footer p b{color:var(--ink-2)}
+
+  /* toast */
+  .toast{
+    position:fixed;left:50%;bottom:22px;transform:translate(-50%,12px);
+    background:#101828;color:#fff;font-size:12.5px;font-weight:600;
+    padding:9px 15px;border-radius:999px;
+    opacity:0;pointer-events:none;transition:opacity .2s,transform .2s;
+    z-index:50;box-shadow:0 8px 24px -10px rgba(0,0,0,.5);
+  }
+  .toast.show{opacity:1;transform:translate(-50%,0)}
+</style>
+</head>
+<body>
+
+<header class="hero">
+  <div class="wrap">
+    <p class="hero-eyebrow">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+        <circle cx="6.5" cy="14" r="3.5"/><circle cx="17.5" cy="14" r="3.5"/>
+        <path d="M10 13.4c.6-.7 3.4-.7 4 0"/><path d="M3 13.4 4.2 7.2h2.3"/><path d="M21 13.4 19.8 7.2h-2.3"/>
+      </svg>
+      안경사 17년 실전 기준
+    </p>
+    <h1>10초 렌즈 압축 &amp; <span>안경테 추천</span> 계산기</h1>
+    <p>도수와 테 형태만 넣으면 <b>추천 굴절률, 설계 4단계, 테별 주의사항</b>을 바로 정리해 드립니다.</p>
+  </div>
+</header>
+
+<main class="wrap">
+  <div class="layout">
+
+    <!-- ================= 입력 ================= -->
+    <section class="panel" aria-labelledby="inputTitle">
+      <div class="panel-title">
+        <h2 id="inputTitle">내 도수 입력</h2>
+        <span>0.25D 스텝 조절</span>
+      </div>
+
+      <!-- SPH -->
+      <div class="field">
+        <div class="field-head">
+          <div>
+            <label for="sph">근시 · 원시 도수 (SPH)</label>
+            <span class="label-sub">안경 처방전의 SPH 값</span>
+          </div>
+          <output class="value-box" id="sphOut" for="sph">-6.00<small>D</small></output>
+        </div>
+        <div class="step-row">
+          <button type="button" class="step-btn" data-step="sph" data-dir="-1" aria-label="SPH 도수 0.25D 낮추기"><b>−0.25</b><small>D</small></button>
+          <input type="range" id="sph" min="-12" max="6" step="0.25" value="-6" aria-describedby="sphScale">
+          <button type="button" class="step-btn" data-step="sph" data-dir="1" aria-label="SPH 도수 0.25D 높이기"><b>+0.25</b><small>D</small></button>
+        </div>
+        <div class="scale-row" id="sphScale"><span>← 고도근시 -12.00</span><span>원시 +6.00 →</span></div>
+        <div class="chips" id="sphChips">
+          <button type="button" class="chip" data-sph="4">+4.00</button>
+          <button type="button" class="chip" data-sph="2">+2.00</button>
+          <button type="button" class="chip" data-sph="0">0.00</button>
+          <button type="button" class="chip" data-sph="-1">-1.00</button>
+          <button type="button" class="chip" data-sph="-2">-2.00</button>
+          <button type="button" class="chip" data-sph="-3">-3.00</button>
+          <button type="button" class="chip" data-sph="-4">-4.00</button>
+          <button type="button" class="chip" data-sph="-5">-5.00</button>
+          <button type="button" class="chip" data-sph="-6">-6.00</button>
+          <button type="button" class="chip" data-sph="-8">-8.00</button>
+          <button type="button" class="chip" data-sph="-10">-10.00</button>
+          <button type="button" class="chip" data-sph="-12">-12.00</button>
+        </div>
+      </div>
+
+      <!-- CYL -->
+      <div class="field">
+        <div class="field-head">
+          <div>
+            <label for="cyl">난시 도수 (CYL)</label>
+            <span class="label-sub">난시가 없으면 0.00</span>
+          </div>
+          <output class="value-box" id="cylOut" for="cyl">-1.25<small>D</small></output>
+        </div>
+        <div class="step-row">
+          <button type="button" class="step-btn" data-step="cyl" data-dir="-1" aria-label="CYL 난시 도수 0.25D 강하게(마이너스 방향)"><b>−0.25</b><small>D</small></button>
+          <input type="range" id="cyl" min="-4" max="0" step="0.25" value="-1.25" aria-describedby="cylScale">
+          <button type="button" class="step-btn" data-step="cyl" data-dir="1" aria-label="CYL 난시 도수 0.25D 약하게(0.00 방향)"><b>+0.25</b><small>D</small></button>
+        </div>
+        <div class="scale-row" id="cylScale"><span>← -4.00 (강한 난시)</span><span>0.00 난시 없음 →</span></div>
+        <div class="chips" id="cylChips">
+          <button type="button" class="chip" data-cyl="0">0.00</button>
+          <button type="button" class="chip" data-cyl="-0.5">-0.50</button>
+          <button type="button" class="chip" data-cyl="-0.75">-0.75</button>
+          <button type="button" class="chip" data-cyl="-1.25">-1.25</button>
+          <button type="button" class="chip" data-cyl="-1.5">-1.50</button>
+          <button type="button" class="chip" data-cyl="-2">-2.00</button>
+          <button type="button" class="chip" data-cyl="-3">-3.00</button>
+          <button type="button" class="chip" data-cyl="-4">-4.00</button>
+        </div>
+      </div>
+
+      <!-- frame shape -->
+      <div class="field">
+        <div class="field-head">
+          <div>
+            <span class="label" id="frameLabel">프레임 형태</span>
+            <span class="label-sub">렌즈 커브가 두께와 왜곡을 좌우합니다</span>
+          </div>
+        </div>
+        <div class="frame-grid" role="radiogroup" aria-labelledby="frameLabel">
+          <label class="frame-card">
+            <input type="radio" name="frame" value="normal" checked>
+            <svg viewBox="0 0 48 26" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true">
+              <rect x="3" y="6" width="17" height="14" rx="6"/>
+              <rect x="28" y="6" width="17" height="14" rx="6"/>
+              <path d="M20 12c2.6-1.6 5.4-1.6 8 0"/><path d="M3 11 1 8"/><path d="M45 11l2-3"/>
+            </svg>
+            <span class="fc-name">일반 안경테</span>
+            <span class="fc-sub">뿔테 · 메탈테</span>
+          </label>
+          <label class="frame-card">
+            <input type="radio" name="frame" value="goggle">
+            <svg viewBox="0 0 48 26" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true">
+              <path d="M3.5 8.5h41c0 8.5-6 12.5-13.5 12.5h-3.6c-2.3 0-2.4-2.6-4.4-2.6s-2.1 2.6-4.4 2.6H16C8.5 21 3.5 17 3.5 8.5Z"/>
+              <path d="M8 12.4h32"/>
+            </svg>
+            <span class="fc-name">고글형</span>
+            <span class="fc-sub">고커브 스포츠<br>선글라스</span>
+          </label>
+          <label class="frame-card">
+            <input type="radio" name="frame" value="flat">
+            <svg viewBox="0 0 48 26" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true">
+              <path d="M3 9h42"/>
+              <path d="M4 9v8c0 3 3 5 7 4l6-2c2-1 3-3 3-5V9"/>
+              <path d="M44 9v8c0 3-3 5-7 4l-6-2c-2-1-3-3-3-5V9"/>
+            </svg>
+            <span class="fc-name">플랫바형</span>
+            <span class="fc-sub">저커브 평면<br>선글라스 · 테</span>
+          </label>
+        </div>
+      </div>
+
+      <!-- frame size / PD -->
+      <div class="field">
+        <div class="field-head">
+          <div>
+            <span class="label" id="sizeLabel">테 크기 · PD</span>
+            <span class="label-sub">렌즈 폭 기준 · 브릿지 18mm 고정</span>
+          </div>
+        </div>
+        <div class="size-grid" role="radiogroup" aria-labelledby="sizeLabel">
+          <label class="size-card">
+            <input type="radio" name="size" value="small">
+            <span class="size-dot"><i style="width:17px;height:13px"></i></span>
+            <span class="sc-name">작음</span>
+            <span class="sc-mm">소형 · 44mm</span>
+          </label>
+          <label class="size-card">
+            <input type="radio" name="size" value="medium" checked>
+            <span class="size-dot"><i style="width:23px;height:16px"></i></span>
+            <span class="sc-name">보통</span>
+            <span class="sc-mm">중형 · 50mm</span>
+          </label>
+          <label class="size-card">
+            <input type="radio" name="size" value="large">
+            <span class="size-dot"><i style="width:29px;height:19px"></i></span>
+            <span class="sc-name">큼</span>
+            <span class="sc-mm">오버사이즈 · 56mm</span>
+          </label>
+        </div>
+        <p class="hint">같은 도수라도 <b>테가 크고 PD가 짧을수록</b> 렌즈 중심에서 가장자리까지 거리가 멀어져 두께가 급격히 늘어납니다. 처방전 PD를 모르면 보통(63mm)을 선택하세요.</p>
+
+        <!-- PD (동공간거리) -->
+        <div class="pd-field">
+          <div class="field-head">
+            <div>
+              <label for="pd">PD (동공간거리)</label>
+              <span class="label-sub">처방전 양안 PD · 1mm 단위</span>
+            </div>
+            <output class="value-box" id="pdOut" for="pd">63<small>mm</small></output>
+          </div>
+          <div class="step-row">
+            <button type="button" class="step-btn" data-step="pd" data-dir="-1" aria-label="PD 1mm 줄이기"><b>−1</b><small>mm</small></button>
+            <input type="range" id="pd" min="56" max="74" step="1" value="63" aria-describedby="pdScale">
+            <button type="button" class="step-btn" data-step="pd" data-dir="1" aria-label="PD 1mm 늘리기"><b>+1</b><small>mm</small></button>
+          </div>
+          <div class="scale-row" id="pdScale"><span>← 56mm 좁은 편</span><span>넓은 편 74mm →</span></div>
+          <div class="chips chips-3" id="pdChips">
+            <button type="button" class="chip" data-pd="58">58</button>
+            <button type="button" class="chip" data-pd="60">60</button>
+            <button type="button" class="chip" data-pd="62">62</button>
+            <button type="button" class="chip" data-pd="64">64</button>
+            <button type="button" class="chip" data-pd="66">66</button>
+            <button type="button" class="chip" data-pd="68">68</button>
+          </div>
+          <p class="pd-hint">편심량 <b>d = (FPD − PD) ÷ 2</b>, FPD는 <b>렌즈 폭 + 브릿지 18mm</b>입니다. PD가 FPD보다 짧으면 광학중심이 <b>귀쪽</b>으로 밀려 귀쪽 가장자리가 두꺼워집니다.</p>
+        </div>
+      </div>
+    </section>
+
+    <!-- ================= 결과 ================= -->
+    <section class="panel results" aria-labelledby="resultTitle" aria-live="polite">
+      <h2 id="resultTitle" class="sr-only" style="position:absolute;width:1px;height:1px;overflow:hidden;clip:rect(0 0 0 0)">추천 결과</h2>
+
+      <div class="verdict">
+        <div class="verdict-top">
+          <span class="tag">추천 굴절률</span>
+          <span class="badge" id="badge">두께·가성비 균형</span>
+        </div>
+        <div class="verdict-main">
+          <strong id="idxVal">1.67</strong>
+          <div class="vm-side">
+            <b id="designVal">양면비구면 (DAS)</b>
+            <span id="designSub">고도수 · 주변부 억제</span>
+          </div>
+        </div>
+        <p id="verdictLine">고도 근시 + 큰 테 조합입니다. <b>1.67</b>로 테두리를 잡고, 양면비구면으로 주변부 왜곡까지 줄이는 조합이 가장 무난합니다.</p>
+        <div class="gauge">
+          <div class="gauge-head"><span>압축 필요도</span><span id="gaugeLabel">테두리 두께 보통</span></div>
+          <div class="gauge-track"><div class="gauge-fill" id="gaugeFill" style="width:52%"></div></div>
+        </div>
+      </div>
+
+      <div class="stats">
+        <div class="stat"><span class="k">등가도수 (SE)</span><span class="v" id="seVal">-6.63<small>D</small></span></div>
+        <div class="stat"><span class="k">최대 굴절력 |SPH+CYL|</span><span class="v" id="powVal">-7.25<small>D</small></span></div>
+        <div class="stat"><span class="k" id="thickKey">테두리 두께 (최대)</span><span class="v" id="thickVal">5.1<small>mm</small></span></div>
+        <div class="stat"><span class="k">FPD (프레임 PD)</span><span class="v" id="fpdVal">68<small>mm</small></span></div>
+        <div class="stat"><span class="k" id="decKey">편심량 d (귀쪽)</span><span class="v" id="decVal">+2.5<small>mm</small></span></div>
+        <div class="stat"><span class="k">난시 비중</span><span class="v" id="cylShare">17<small>%</small></span></div>
+      </div>
+      <p class="pd-formula" id="pdFormula">브릿지 18mm 가정 · FPD 68mm · 편심 +2.5mm</p>
+
+      <!-- 옆면 두께 & 뿔테 vs 메탈테 장착 비교 -->
+      <div class="block" id="sideBlock">
+        <h3>안경 옆모습 &amp; 테 장착 두께 비교</h3>
+        <p class="sc-intro" id="scIntro">추정 최대 테두리 <b>5.1mm</b> · 중심 1.0mm — 같은 렌즈를 뿔테(림 4.2mm)에 끼우면 <b>0.9mm</b>, 메탈테(림 1.3mm)에는 <b>3.8mm</b>가 림 밖으로 드러납니다.</p>
+        <div class="sc-grid">
+          <article class="sc-card" data-side="horn">
+            <div class="sc-head">
+              <span class="sc-name">일반 뿔테</span>
+              <span class="sc-rim">림 4.2mm</span>
+            </div>
+            <svg class="sc-svg" viewBox="0 0 200 102" role="img" aria-label="일반 뿔테를 옆에서 본 모습과 렌즈 측면 노출">
+              <g data-art="horn"></g>
+            </svg>
+            <div class="sc-badge" data-badge="horn">
+              <span class="k">측면 노출</span>
+              <span class="v" data-badge-v="horn">0.5<small>mm</small></span>
+            </div>
+            <p class="sc-sub" data-sub="horn">앞·뒤 각 0.25mm · 림이 거의 가려 줍니다</p>
+          </article>
+          <article class="sc-card is-metal" data-side="metal">
+            <div class="sc-head">
+              <span class="sc-name">얇은 메탈테</span>
+              <span class="sc-rim">림 1.3mm</span>
+            </div>
+            <svg class="sc-svg" viewBox="0 0 200 102" role="img" aria-label="얇은 메탈테를 옆에서 본 모습과 렌즈 측면 노출">
+              <g data-art="metal"></g>
+            </svg>
+            <div class="sc-badge" data-badge="metal">
+              <span class="k">측면 노출</span>
+              <span class="v" data-badge-v="metal">3.4<small>mm</small></span>
+            </div>
+            <p class="sc-sub" data-sub="metal">앞·뒤 각 1.7mm · 두께가 그대로 보입니다</p>
+          </article>
+        </div>
+        <p class="sc-legend">
+          <span><i style="background:#cfe4f7;border:1px solid #7ba7cf"></i>림에 끼운 렌즈 단면</span>
+          <span><i style="background:#4d5d72"></i>뿔테 림·다리</span>
+          <span><i style="background:#e3e9f1;border:1px solid #8b9cb0"></i>메탈테 림·다리</span>
+          <span><i style="background:#f59e0b"></i>림 밖으로 나온 렌즈</span>
+          <span class="sc-scale">측면 모식도 · 앞뒤 두께는 확대</span>
+        </p>
+        <p class="sc-note" id="scNote">비교 기준은 <b>일반 뿔테 림 약 4.2mm vs 얇은 메탈테 림 약 1.3mm</b>입니다. 실제 노출은 제품 림 형상(측면 커버형·반무테·홈파기)과 렌즈 가공 방식에 따라 달라집니다.</p>
+      </div>
+
+      <!-- 같은 PD · 테 크기별 두께 비교 -->
+      <div class="block" id="cmpBlock">
+        <h3>같은 PD · 테 크기별 두께 비교</h3>
+        <p class="sc-intro" id="cmpIntro">브릿지 18mm · PD 63mm 기준입니다.</p>
+        <div class="cmp" role="table" aria-label="테 크기별 FPD, 편심량, 예상 두께 비교">
+          <div class="cmp-head" role="row">
+            <span role="columnheader">테 크기</span>
+            <span role="columnheader">FPD</span>
+            <span role="columnheader">편심량 d</span>
+            <span role="columnheader">두께</span>
+          </div>
+          <div id="cmpBody"></div>
+        </div>
+        <p class="cmp-note" id="cmpNote">편심량 <b>+는 귀쪽, −는 코쪽</b> 편심입니다. 최대 테두리는 광학중심에서 가장 먼 가장자리(A/2 + |d|) 기준입니다.</p>
+      </div>
+
+      <div class="block">
+        <h3>왜 이 조합인가</h3>
+        <ul id="whyList">
+          <li>결과를 계산하는 중입니다.</li>
+        </ul>
+      </div>
+
+      <div class="block" id="designCompare">
+        <h3>렌즈 설계 4단계 비교</h3>
+        <p class="dc-intro">지금 조합 추천은 <b id="dcNow">—</b>. 같은 도수라도 설계에 따라 두께·주변부 왜곡·시야가 달라집니다.</p>
+        <div class="dc-grid" id="dcGrid"></div>
+        <p class="dc-legend">막대 5칸은 상대 수준입니다. <b>두께·주변 왜곡·시야감은 막대가 길수록 유리</b>하고, <b>가격 부담은 길수록 비쌉니다</b>. 도수가 높고 테가 클수록 설계 간 차이가 커지고, 저도수·작은 테에서는 거의 차이가 없습니다.</p>
+      </div>
+
+      <div class="block">
+        <h3 id="tipsTitle">일반 안경테 실전 팁</h3>
+        <ul id="tipsList"></ul>
+      </div>
+
+      <div class="risk">
+        <div class="risk-box" id="riskBox">
+          <div class="rt">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+              <path d="M12 3 2.5 20h19L12 3Z"/><path d="M12 9v5"/><path d="M12 17.2v.1"/>
+            </svg>
+            제작 전 확인
+          </div>
+          <div id="riskText"><p>실제 두께는 렌즈 블랭크 지름·가공 방식·테 형상에 따라 달라집니다. 매장에서 실물 샘플로 확인하세요.</p></div>
+        </div>
+      </div>
+
+      <div class="actions">
+        <button type="button" class="btn primary" id="copyBtn">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+            <rect x="9" y="9" width="12" height="12" rx="2"/><path d="M5 15V5a2 2 0 0 1 2-2h8"/>
+          </svg>
+          결과 복사
+        </button>
+        <button type="button" class="btn" id="resetBtn">초기화</button>
+      </div>
+
+      <p class="disclaimer">※ 이 계산기는 안경원 정밀 검안·조제 전 <b>참고용</b>입니다. 실제 처방은 검안 결과와 착용 습관, 테 피팅에 따라 달라집니다.</p>
+    </section>
+  </div>
+
+  <!-- ================= 수익화 자리 (쿠팡 파트너스) ================= -->
+  <section class="partner" aria-labelledby="partnerTitle">
+    <div class="partner-head">
+      <h2 id="partnerTitle">안경 관리, 이거면 끝</h2>
+      <p>렌즈 오래 쓰는 사람들이 실제로 쓰는 용품</p>
+    </div>
+
+    <!--
+      =====================================================================
+      [쿠팡 파트너스 링크 삽입 위치]
+      아래 3개 카드의 <a class="p-card" href="여기에_파트너스_링크"> 만 바꾸면 됩니다.
+      - 초음파 세척기  : href="https://link.coupang.com/..." (본인 파트너스 링크)
+      - 김서림 방지제  : href="https://link.coupang.com/..."
+      - 실리콘 코받침 : href="https://link.coupang.com/..."
+      썸네일은 <div class="p-thumb"> 안에 <img src="상품이미지URL" alt="상품명">
+      를 넣거나, 파트너스 상품 이미지 태그로 교체하세요.
+      rel="sponsored nofollow noopener" target="_blank" 는 유지하는 것을 권장합니다.
+      =====================================================================
+    -->
+    <div class="partner-grid">
+      <!-- SLOT 1: 초음파 세척기 -->
+      <a class="p-card" href="#" data-slot="ultrasonic" rel="sponsored nofollow noopener">
+        <div class="p-thumb">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+            <rect x="3" y="6" width="18" height="13" rx="3"/><path d="M7 10h10"/><circle cx="8" cy="14" r="1"/><circle cx="12" cy="15" r="1"/><circle cx="16" cy="14" r="1"/>
+          </svg>
+        </div>
+        <div class="p-body">
+          <span class="p-cat">세척</span>
+          <p class="p-name">초음파 안경 세척기</p>
+          <p class="p-desc">코받침 틈·림 안쪽에 낀 피지까지</p>
+          <span class="p-link">쿠팡에서 보기</span>
+        </div>
+      </a>
+
+      <!-- SLOT 2: 김서림 방지제 -->
+      <a class="p-card" href="#" data-slot="anti-fog" rel="sponsored nofollow noopener">
+        <div class="p-thumb">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+            <path d="M6 13c0-2.8 2.7-5 6-5s6 2.2 6 5"/><path d="M6 13h12"/><path d="M8 16.5c1.2 1 2.5 1.5 4 1.5s2.8-.5 4-1.5"/><path d="M12 3v2.5"/><path d="M5.2 4.6 6.6 6.2"/><path d="M18.8 4.6 17.4 6.2"/>
+          </svg>
+        </div>
+        <div class="p-body">
+          <span class="p-cat">김서림</span>
+          <p class="p-name">김서림 방지제</p>
+          <p class="p-desc">마스크·실내외 온도차에 필수</p>
+          <span class="p-link">쿠팡에서 보기</span>
+        </div>
+      </a>
+
+      <!-- SLOT 3: 실리콘 코받침 / 귀팁 -->
+      <a class="p-card" href="#" data-slot="nose-pad" rel="sponsored nofollow noopener">
+        <div class="p-thumb">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+            <path d="M4 7h16"/><path d="M7 7v6a3 3 0 0 0 3 3h1"/><path d="M17 7v6a3 3 0 0 1-3 3h-1"/><circle cx="12" cy="19" r="1.6"/>
+          </svg>
+        </div>
+        <div class="p-body">
+          <span class="p-cat">착용감</span>
+          <p class="p-name">실리콘 코받침 · 귀팁</p>
+          <p class="p-desc">흘러내림·귀 통증 잡는 소모품</p>
+          <span class="p-link">쿠팡에서 보기</span>
+        </div>
+      </a>
+    </div>
+
+    <!-- 공정위 문구 자리 (필수 표기) -->
+    <p class="partner-note">이 페이지는 <b>쿠팡 파트너스 활동</b>의 일환으로, 이에 따른 일정액의 수수료를 제공받습니다. 상품 가격·배송 정보는 쿠팡 판매 페이지 기준입니다.</p>
+  </section>
+</main>
+
+<footer class="site-footer">
+  <div class="wrap">
+    <p><b>10초 렌즈 압축 &amp; 안경테 추천 계산기</b> · 참고용 도구입니다. 처방·조제는 반드시 안경원 검안 후 진행하세요. 두께 추정치는 렌즈 지름과 굴절률로 계산한 근사값이며 실제 제품과 차이가 있을 수 있습니다.</p>
+  </div>
+</footer>
+
+<div class="toast" id="toast" role="status" aria-live="polite">복사했습니다</div>
+
+<script>
+(function () {
+  "use strict";
+
+  /* ---------------- 기준 데이터 ---------------- */
+  // 브릿지 폭 고정값(mm) — FPD = 렌즈 폭 + 18
+  var BRIDGE = 18;
+  // 테 크기: 렌즈 폭(mm)
+  var SIZES = {
+    small:  { label: "작음", lens: 44, cmp: "작은 테" },
+    medium: { label: "보통", lens: 50, cmp: "보통 테" },
+    large:  { label: "큼",   lens: 56, cmp: "큰 테" }
+  };
+  // 프레임 형태별 두께 가중치
+  var FRAMES = {
+    normal: { label: "일반 안경테", f: 1.00 },
+    goggle: { label: "고글형",     f: 1.12 },
+    flat:   { label: "플랫바형",   f: 0.98 }
+  };
+  // 굴절률별 굴절률(n)·아베수(색수차 지표)
+  var INDEX = {
+    "1.56": { n: 1.561, abbe: 36, name: "1.56" },
+    "1.60": { n: 1.597, abbe: 41, name: "1.60" },
+    "1.67": { n: 1.665, abbe: 32, name: "1.67" },
+    "1.74": { n: 1.738, abbe: 33, name: "1.74" }
+  };
+
+  /* 렌즈 설계 4단계 — 구면 → 비구면 → 양면비구면 → 프리폼(개인맞춤)
+     thick/dist/field: 5칸 상대 평가(클수록 유리), price: 가격 부담(클수록 비쌈) */
+  var DESIGNS = {
+    sph: { rank: 1, name: "구면", full: "구면 (SPH)", sub: "단일 곡면 · 기본",
+           thick: 2, dist: 2, field: 2, price: 1 },
+    as:  { rank: 2, name: "비구면", full: "비구면 (AS)", sub: "앞면만 비구면",
+           thick: 3, dist: 3, field: 3, price: 2 },
+    das: { rank: 3, name: "양면비구면", full: "양면비구면 (DAS)", sub: "앞·뒷면 모두 비구면",
+           thick: 4, dist: 4, field: 4, price: 3 },
+    ff:  { rank: 4, name: "프리폼", full: "프리폼 (개인맞춤)", sub: "착용값 반영 자유곡면",
+           thick: 4, dist: 5, field: 5, price: 4 }
+  };
+  var DESIGN_ORDER = ["sph", "as", "das", "ff"];
+
+  var state = { sph: -6, cyl: -1.25, frame: "normal", size: "medium", pd: 63 };
+  var DEFAULT = { sph: -6, cyl: -1.25, frame: "normal", size: "medium", pd: 63 };
+
+  var $ = function (sel) { return document.querySelector(sel); };
+
+  /* ---------------- 포맷 ---------------- */
+  function fmt(v, digits) {
+    var d = (digits === undefined) ? 2 : digits;
+    if (Math.abs(v) < 0.0001) return (0).toFixed(d);
+    return (v > 0 ? "+" : "-") + Math.abs(v).toFixed(d);
+  }
+  function fmtSigned(v, digits) { // 부호 없는 표시용
+    var d = (digits === undefined) ? 2 : digits;
+    if (Math.abs(v) < 0.0001) return (0).toFixed(d);
+    return (v > 0 ? "+" : "-") + Math.abs(v).toFixed(d);
+  }
+  function round(v, d) { var k = Math.pow(10, d); return Math.round(v * k) / k; }
+  function sgnTxt(v, d) {
+    var dd = (d === undefined) ? 1 : d;
+    var a = Math.abs(v);
+    if (a < 0.005) return a.toFixed(dd);
+    return (v > 0 ? "+" : "-") + a.toFixed(dd);
+  }
+
+  /* ---------------- 안경원 편심 계산 ----------------
+     FPD = 렌즈 폭(A) + 브릿지 18mm
+     d   = (FPD - PD) / 2   → +면 귀쪽, -면 코쪽으로 광학중심 이동
+     r_max = A/2 + |d|      → 광학중심에서 가장 먼 가장자리 반지름 */
+  function frameGeom(A, pd) {
+    var fpd = A + BRIDGE;
+    var dec = (fpd - pd) / 2;
+    var rmax = A / 2 + Math.abs(dec);
+    return { A: A, fpd: fpd, dec: dec, rmax: rmax, dia: 2 * rmax };
+  }
+  // 가장 먼 가장자리(A/2+|d|)를 기준으로 한 두께(mm). 굴절률·단면 형태 반영
+  function edgeThick(rmax, idx, mode, pow) {
+    if (mode === "plano") return 1.5;
+    var n = INDEX[idx].n;
+    var sag = (pow * rmax * rmax) / (2000 * (n - 1));
+    return mode === "plus" ? 1.2 + sag : 1.0 + sag;
+  }
+
+  /* ---------------- 계산 ---------------- */
+  function compute() {
+    var sph = state.sph, cyl = state.cyl;
+    var se = sph + cyl / 2;                 // 등가도수
+    var pow = Math.abs(sph + cyl);          // 최대 굴절력 (최강 경선)
+    var size = SIZES[state.size];
+    var frame = FRAMES[state.frame];
+
+    // 실제 안경원 편심 계산: 브릿지 18mm 고정
+    var geo = frameGeom(size.lens, state.pd);
+    var dia = geo.dia;      // 필요한 렌즈 지름 = 2 · r_max
+    var r = geo.rmax;       // 광학중심 → 가장 먼 가장자리
+
+    // 프레임 부하: 도수 × 테 크기 계수 × 형태 계수
+    var sizeF = dia / frameGeom(SIZES.medium.lens, state.pd).dia;
+    var load = pow * sizeF * frame.f;
+
+    // 굴절률 추천 (근시/원시 임계값 분리)
+    var pick;
+    if (sph > 0) {
+      if (load < 2.5) pick = "1.56";
+      else if (load < 4.5) pick = "1.60";
+      else pick = "1.67";
+    } else {
+      if (load < 2.5) pick = "1.56";
+      else if (load < 5.0) pick = "1.60";
+      else if (load < 8.5) pick = "1.67";
+      else pick = "1.74";
+    }
+
+    // 렌즈 설계 4단계: 도수(최대 굴절력·난시)와 테 형태/크기로 분기
+    var plano = Math.abs(sph) < 0.25 && Math.abs(cyl) < 0.25;
+    var designKey = pickDesign(sph, cyl, state.frame, state.size);
+    var design = DESIGNS[designKey].full;
+    var designSub = plano ? "도수 없음 · 설계 차이 없음" : designSubFor(designKey, state.frame, state.size);
+    var sev = sevOf(sph, cyl);
+
+    // 두께 추정: sag = D·r² / (2000·(n-1)) [mm]
+    function thicknessFor(idx) {
+      var n = INDEX[idx].n;
+      var sag = (pow * r * r) / (2000 * (n - 1));
+      return { sag: sag, n: n };
+    }
+    var chosen = thicknessFor(pick);
+    var base156 = thicknessFor("1.56");
+    var thinGain = base156.sag > 0 ? (1 - chosen.sag / base156.sag) * 100 : 0;
+
+    /* 단면 프로파일(옆면 시각화 공통값)
+       근시(마이너스): 중심을 가공 최소 1.0mm로 두고 가장자리가 sag만큼 두꺼워짐 → 오목 단면
+       원시(플러스):  가장자리를 최소 1.2mm로 두고 중심이 sag만큼 두꺼워짐 → 볼록 단면
+       0.00도수: 균일 1.5mm 평면 단면 */
+    var mode = plano ? "plano" : ((sph + cyl) > 0 ? "plus" : "minus");
+    var prof = {
+      mode: mode,
+      te: mode === "plus" ? 1.2 : (mode === "plano" ? 1.5 : round(1.0 + chosen.sag, 2)),
+      tc: mode === "minus" ? 1.0 : (mode === "plano" ? 1.5 : round(1.2 + chosen.sag, 2)),
+      sag: chosen.sag
+    };
+    var shownThick = mode === "plus" ? prof.tc : prof.te; // 통계 카드에 보여줄 두께(근시=테두리, 원시=중심)
+
+    // 소형 테 대비 두께 증가율
+    var rSmall = frameGeom(SIZES.small.lens, state.pd).rmax;
+    var frameGain = (r * r) / (rSmall * rSmall) - 1;
+
+    return {
+      sph: sph, cyl: cyl, se: se, pow: pow, sev: sev, plano: plano,
+      load: load, pick: pick,
+      designKey: designKey, design: design, designSub: designSub,
+      designStep: DESIGNS[designKey].rank,
+      thickness: round(shownThick, 1),
+      prof: prof,
+      thinGain: round(thinGain, 0),
+      frameGain: round(frameGain * 100, 0),
+      abbe: INDEX[pick].abbe,
+      n: chosen.n,
+      dia: round(dia, 1),
+      pd: state.pd,
+      sizeA: size.lens,
+      fpd: geo.fpd,
+      dec: geo.dec,
+      rmax: geo.rmax,
+      base156Edge: round(1.0 + base156.sag, 1)
+    };
+  }
+
+  /* ---------------- 설계 추천 ---------------- */
+  // 최대 굴절력(s)과 난시(ac)를 기준으로 4단계 중 하나를 고른다.
+  // 고글형(하이커브)은 커브·틸트·정점거리 보정이 필수라 항상 프리폼.
+  function pickDesign(sph, cyl, frame, size) {
+    var s = Math.abs(sph + cyl);
+    var ac = Math.abs(cyl);
+    if (Math.abs(sph) < 0.25 && ac < 0.25) return "sph";  // 도수 0.00 = 설계 논외
+    if (frame === "goggle") return "ff";
+    if (frame === "flat") {
+      if (s >= 5.0 || ac >= 2.0 || (s >= 4.0 && size === "large")) return "ff";
+      if (s >= 3.0 || ac >= 1.5) return "das";
+      if (s >= 2.5 || ac >= 1.25) return "as";
+      return "sph";
+    }
+    if (s >= 9.0) return "ff";
+    if (s >= 6.0 || ac >= 2.0) return "das";
+    if (s >= 2.0 || ac >= 1.25 || size === "large") return "as";
+    return "sph";
+  }
+
+  function sevOf(sph, cyl) {
+    var s = Math.abs(sph + cyl);
+    var ac = Math.abs(cyl);
+    if (s >= 9.0) return 3;
+    if (s >= 6.0 || ac >= 2.0) return 2;
+    if (s >= 2.0 || ac >= 1.25) return 1;
+    return 0;
+  }
+
+  function designSubFor(key, frame, size) {
+    if (key === "ff") {
+      if (frame === "goggle") return "커브·틸트 보정 필수";
+      if (frame === "flat") return "저커브 · 고도수 대응";
+      return "초고도 · 유효 시야 확보";
+    }
+    if (key === "das") {
+      if (frame === "flat") return "저커브 · 두께·왜곡 억제";
+      return "고도수 · 주변부 억제";
+    }
+    if (key === "as") {
+      if (frame === "flat") return "저커브 전용";
+      return size === "large" ? "큰 테 주변부 억제" : "두께·왜곡 균형";
+    }
+    return frame === "flat" ? "저커브 전용 · 가성비" : "저도수는 구면으로 충분";
+  }
+
+  /* ---------------- 라벨 ---------------- */
+  function thicknessLevel(mm) {
+    if (mm < 3.0) return { t: "얇음", p: 18 };
+    if (mm < 4.5) return { t: "보통", p: 42 };
+    if (mm < 6.0) return { t: "두꺼움", p: 68 };
+    return { t: "매우 두꺼움", p: 92 };
+  }
+  function yearLabel(sph) {
+    var a = Math.abs(sph);
+    if (sph > 0) {
+      if (a < 2) return "경도 원시";
+      if (a < 4) return "중등도 원시";
+      return "고도 원시";
+    }
+    if (a < 1.5) return "거의 정시";
+    if (a < 3) return "경도 근시";
+    if (a < 6) return "중등도 근시";
+    return "고도 근시";
+  }
+  function badgeText(r) {
+    if (r.pick === "1.74") return "최대 압축 필요";
+    if (r.pick === "1.67") return "두께·가성비 균형";
+    if (r.pick === "1.60") return "표준보다 한 단계 얇게";
+    return "과하지 않게, 가성비 우선";
+  }
+
+  /* ---------------- 렌더 ---------------- */
+  function render() {
+    var r = compute();
+
+    // 입력 표시
+    $("#sphOut").innerHTML = fmt(r.sph) + "<small>D</small>";
+    $("#cylOut").innerHTML = fmt(r.cyl) + "<small>D</small>";
+    $("#pdOut").innerHTML = state.pd + "<small>mm</small>";
+    document.querySelectorAll("#pdChips .chip").forEach(function (b) {
+      b.setAttribute("aria-pressed", String(parseInt(b.dataset.pd, 10) === state.pd));
+    });
+
+    // 칩 활성
+    document.querySelectorAll("#sphChips .chip").forEach(function (b) {
+      b.setAttribute("aria-pressed", String(parseFloat(b.dataset.sph) === r.sph));
+    });
+    document.querySelectorAll("#cylChips .chip").forEach(function (b) {
+      b.setAttribute("aria-pressed", String(parseFloat(b.dataset.cyl) === r.cyl));
+    });
+
+    // 굴절률 · 설계
+    $("#idxVal").textContent = r.pick;
+    $("#designVal").textContent = r.design;
+    $("#designSub").textContent = r.designSub;
+    $("#badge").textContent = badgeText(r);
+
+    // 요약 문장
+    var seTxt = fmt(r.se);
+    var line;
+    if (r.sph > 0) {
+      line = "<b>" + yearLabel(r.sph) + "</b>(" + fmt(r.sph) + "D)입니다. 원시는 테두리가 아니라 <b>중심 두께</b>가 문제라, 얇은 렌즈보다 테 지름을 줄이는 쪽이 효과적입니다.";
+    } else if (r.pick === "1.74") {
+      var alt = (state.frame === "flat")
+        ? "저커브 전용 설계는 1.74 라인업이 거의 없어, <b>1.67 + 한 단계 작은 테</b>가 현실적인 대안입니다."
+        : (state.frame === "goggle"
+            ? "고커브·특수 컬러 렌즈는 1.74 미지원이 많아 매장 확인이 필요합니다."
+            : "1.74는 1.67보다 얇지만 가격이 크게 뛰고 무게 이득은 작아, 두께가 실제로 문제될 때만 권합니다.");
+      line = "<b>" + yearLabel(r.sph) + " + " + FRAMES[state.frame].label + "</b> 조합으로 압축이 꼭 필요한 구간입니다. <b>1.74</b>가 가장 얇습니다. " + alt;
+    } else if (r.pick === "1.67") {
+      var dTxt = r.designKey === "ff"
+        ? "프리폼으로 커브·착용값까지 맞춰 주변부 왜곡을 잡는"
+        : (r.designKey === "das" ? "양면비구면으로 주변부 왜곡까지 줄이는" : "비구면으로 주변부 왜곡까지 줄이는");
+      line = "<b>" + yearLabel(r.sph) + " + " + FRAMES[state.frame].label + "·" + SIZES[state.size].label + " 테</b> 조합입니다. <b>1.67</b>로 테두리를 잡고 " + dTxt + " 조합이 가장 무난합니다.";
+    } else if (r.pick === "1.60") {
+      line = "<b>" + yearLabel(r.sph) + "</b> 구간입니다. <b>1.60</b>은 1.56보다 확실히 얇으면서 아베수(41)가 높아, 선명도와 가격의 균형점입니다.";
+    } else {
+      line = "<b>" + yearLabel(r.sph) + "</b> 구간이라 굳이 비싼 고굴절을 쓸 이유가 없습니다. <b>1.56</b> 표준 렌즈로 충분하고, 남는 예산은 테 피팅과 코받침에 쓰는 편이 낫습니다.";
+    }
+    $("#verdictLine").innerHTML = line;
+
+    // 게이지
+    var lv = thicknessLevel(r.thickness);
+    $("#gaugeLabel").textContent = (r.sph > 0 ? "중심 두께 " : "테두리 두께 ") + lv.t;
+    $("#gaugeFill").style.width = lv.p + "%";
+
+    // 스탯
+    $("#seVal").innerHTML = seTxt + "<small>D</small>";
+    $("#powVal").innerHTML = fmt(r.sph + r.cyl) + "<small>D</small>";
+    $("#thickKey").textContent = (r.sph > 0 ? "중심 두께" : "테두리 두께 (최대)");
+    $("#thickVal").innerHTML = r.thickness.toFixed(1) + "<small>mm</small>";
+    $("#fpdVal").innerHTML = r.fpd + "<small>mm</small>";
+    $("#decKey").textContent = "편심량 d (" + (Math.abs(r.dec) < 0.05 ? "중심 일치" : (r.dec > 0 ? "귀쪽" : "코쪽")) + ")";
+    $("#decVal").innerHTML = sgnTxt(r.dec, 1) + "<small>mm</small>";
+    $("#pdFormula").innerHTML = "브릿지 <b>18mm</b> 고정 · FPD = " + r.sizeA + "(A) + 18 = <b>" + r.fpd +
+      "mm</b> · d = (" + r.fpd + " − " + r.pd + ") ÷ 2 = <b>" + sgnTxt(r.dec, 1) + "mm</b> → " +
+      (Math.abs(r.dec) < 0.05
+        ? "광학중심이 테 중심과 일치"
+        : "광학중심이 테 중심에서 " + Math.abs(r.dec).toFixed(1) + "mm " + (r.dec > 0 ? "귀쪽" : "코쪽") + "으로 이동") +
+      ", 렌즈 지름 " + r.dia + "mm";
+    var share = (Math.abs(r.sph) + Math.abs(r.cyl)) > 0
+      ? Math.round(Math.abs(r.cyl) / (Math.abs(r.sph) + Math.abs(r.cyl)) * 100) : 0;
+    $("#cylShare").innerHTML = share + "<small>%</small>";
+
+    // 왜 이 조합인가
+    var why = [];
+    why.push("<b>등가도수 " + fmt(r.se) + "D · 최대 굴절력 " + fmt(r.sph + r.cyl) + "D</b> — " + yearLabel(r.sph) + " 구간입니다. 실제 두께는 등가도수가 아니라 가장 강한 경선(" + fmt(r.sph + r.cyl) + "D)이 결정하므로, 등가도수만 보면 두께를 과소평가하기 쉽습니다.");
+    why.push("브릿지 18mm · PD " + r.pd + "mm → FPD <span class='num'>" + r.fpd + "mm</span> · 편심 <span class='num'>" + sgnTxt(r.dec, 1) + "mm</span>(" + (Math.abs(r.dec) < 0.05 ? "중심" : (r.dec > 0 ? "귀쪽" : "코쪽")) + ")라서 광학중심에서 가장 먼 가장자리가 <span class='num'>" + r.rmax.toFixed(1) + "mm</span>입니다. 같은 도수에서도 작은 테(44mm) 대비 두께가 약 <span class='num'>" + r.frameGain + "%</span> 늘어나며, 두께는 반지름의 <b>제곱</b>에 비례합니다.");
+    if (r.pick === "1.74") {
+      why.push("<b>1.74</b>는 1.56 대비 두께 약 <span class='num'>" + r.thinGain + "%</span> 감소. 다만 비중이 커서 무게 감소는 두께만큼 크지 않고, 가격이 크게 뜁니다. 두께가 실제로 문제일 때만 선택하세요.");
+    } else if (r.pick === "1.67") {
+      var gain174 = round((1 - (1.561 - 1) / (INDEX["1.74"].n - 1)) * 100, 0);
+      why.push("<b>1.67</b>은 1.56 대비 두께 약 <span class='num'>" + r.thinGain + "%</span> 감소. 1.74(약 " + gain174 + "%)와 차이가 크지 않아, 가격 대비 이득이 가장 큰 지점입니다.");
+    } else if (r.pick === "1.60") {
+      why.push("<b>1.60</b>은 1.56 대비 두께 약 <span class='num'>" + r.thinGain + "%</span> 감소에 아베수 " + r.abbe + "로 색수차가 적습니다. 이 도수대에서 가장 실패가 적은 선택입니다.");
+    } else {
+      why.push("<b>1.56</b>으로도 충분한 도수입니다. 여기서 1.67·1.74로 올리면 두께 이득은 1mm가 안 되는데 가격만 크게 오릅니다.");
+    }
+    why.push("<b>추천 설계 " + r.design + "</b> — " + designReason(r));
+    why.push(stepNote(r));
+    if (Math.abs(r.cyl) >= 1.0) {
+      why.push("난시 <b>" + fmt(r.cyl) + "D</b>가 더해져 가장자리 두께 차이가 생깁니다. 렌즈를 돌리지 않도록 조립 후 축 확인이 필요합니다.");
+    }
+    $("#whyList").innerHTML = why.map(function (t) { return "<li>" + t + "</li>"; }).join("");
+
+    // 팁
+    $("#tipsTitle").textContent = FRAMES[state.frame].label + " 실전 팁";
+    $("#tipsList").innerHTML = tipsFor(r).map(function (t) { return "<li>" + t + "</li>"; }).join("");
+
+    // 설계 4단계 비교
+    renderCompare(r);
+
+    // 리스크
+    renderRisk(r);
+
+    // 옆면 두께 · 테 장착 비교
+    renderSide(r);
+
+    // 테 크기별 두께 비교
+    renderSizeCompare(r);
+
+    // 0.25D 스텝 버튼 경계 상태
+    syncStepButtons();
+  }
+
+  function designReason(r) {
+    var k = r.designKey;
+    if (r.plano) {
+      return "도수가 0.00이라 어떤 설계를 써도 광학적 차이가 없습니다. 테 커브에 맞는 기본 렌즈면 충분하고, 비용은 테와 코받침 피팅에 쓰는 편이 낫습니다";
+    }
+    if (state.frame === "goggle") {
+      return "고커브(6~8커브) 테는 렌즈 곡률을 테 커브에 맞추고 전경각·정점거리까지 보정해야 합니다. 구면·일반 비구면은 곡률이 어긋나 주변부가 휘어 보이고 어지러우며, 두꺼운 가장자리가 림 밖으로 돌출됩니다. 개인 착용값을 넣어 안쪽 면을 깎는 프리폼 내면비구면이 사실상 유일한 선택입니다";
+    }
+    if (k === "ff") {
+      return (state.frame === "flat")
+        ? "저커브 테에 고도수를 넣으면 가장자리 돌출과 주변부 왜곡이 한계에 몰립니다. 커브·틸트·정점거리를 반영해 한 장씩 깎는 프리폼이 가장 안전합니다"
+        : "초고도 구간은 표준 착용값(정점거리 12mm·전경각 8~12°)과 실제 착용값의 차이가 시야에 그대로 드러납니다. 눈 위치와 테 각도까지 반영하는 프리폼이 유효 시야를 가장 넓게 유지합니다";
+    }
+    if (k === "das") {
+      return "앞·뒷면을 모두 비구면으로 깎아 비점수차·왜곡을 양면에서 나눠 맡습니다. 한 면만 깎는 일반 비구면보다 주변부가 선명하고 가장자리 두께·축소현상이 덜합니다";
+    }
+    if (k === "as") {
+      return r.sph > 0
+        ? "앞면을 비구면으로 깎아 원시 특유의 확대 왜곡을 줄이고 중심 두께를 다듬어 렌즈가 덜 도톰해 보이게 합니다"
+        : "앞면을 비구면으로 깎아 주변부 왜곡·울렁거림을 줄이고 가장자리를 평탄하게 만들어 두께가 덜 보이게 합니다";
+    }
+    return "이 도수에서는 구면과 비구면의 체감 차이가 작아, 비용을 아끼고 테 피팅에 쓰는 편이 낫습니다";
+  }
+
+  // 추천 설계의 한 단계 위·아래와 비교한 판단 근거
+  function stepNote(r) {
+    var k = r.designKey;
+    if (r.plano) {
+      return "도수가 없으니 설계를 올릴 이유도 없습니다. 고굴절·고급 설계는 이 경우 비용만 늘립니다.";
+    }
+    if (k === "ff") {
+      if (state.frame === "goggle") {
+        return "한 단계 낮은 <b>구면·일반 비구면</b>은 고커브 테에 곡률이 맞지 않아 주변부 왜곡·렌즈 이탈로 <b>사실상 사용할 수 없습니다</b>. 저도수·저난시라면 고커브 전용 완성 렌즈로 비용을 낮출 수는 있지만, 틸트·정점거리 보정은 포기해야 합니다.";
+      }
+      if (state.frame === "flat") {
+        return "한 단계 낮은 <b>양면비구면(저커브)</b>도 쓸 수 있지만, 이 도수에서는 가장자리 돌출과 주변부 왜곡이 남습니다. 프리폼은 커브·틸트를 반영해 그 한계를 넘깁니다.";
+      }
+      return "한 단계 낮은 <b>양면비구면</b>이 현실적인 대안입니다. 다만 표준 착용값을 가정하므로 실제 정점거리·전경각 차이가 크면 주변부 선명도와 유효 시야에서 손해가 납니다.";
+    }
+    if (k === "das") {
+      return "한 단계 낮은 <b>비구면</b>은 앞면 한 곳에서만 수차를 잡아, 이 도수·테에서는 주변부 왜곡과 가장자리 두께가 남습니다. <b>구면</b>은 차이가 더 큽니다.";
+    }
+    if (k === "as") {
+      return "한 단계 낮은 <b>구면</b>은 가장자리가 더 두껍고 주변부 왜곡이 커집니다. 한 단계 위 양면비구면은 주변부가 조금 더 좋아지지만 이 도수에서는 차이가 크지 않습니다.";
+    }
+    return "비구면 이상으로 올리면 주변부 왜곡이 조금 줄지만, 이 도수·테에서는 체감 차이가 작고 가격만 올라갑니다.";
+  }
+
+  function cardNote(key, rec, plano) {
+    var rk = DESIGNS[key].rank, rr = DESIGNS[rec].rank;
+    if (key === rec) {
+      if (plano) return "도수가 0.00 — 설계 차이 없음";
+      if (state.frame === "goggle") return "커브·틸트·정점거리까지 보정되는 유일한 선택";
+      if (key === "ff") return "이 도수·테에서 유효 시야가 가장 넓음";
+      if (key === "das") return "이 도수에서 두께·왜곡을 잡는 균형점";
+      if (key === "as") return "이 구간에서 실패가 가장 적은 선택";
+      return "이 도수에서는 차이를 느끼기 어려움";
+    }
+    if (rk < rr) {
+      if (state.frame === "goggle") {
+        return (key === "das")
+          ? "커브는 맞춰도 틸트·정점거리 보정이 빠짐"
+          : "고커브 테에는 곡률이 안 맞아 비추천";
+      }
+      if (key === "sph" && rr >= 3) return "이 도수에선 두께·왜곡 손해가 큼";
+      if (key === "as" && rr >= 3) return "한 면만 잡아 고도수에서 한계";
+      if (key === "das" && rr === 4) return "표준 착용값 가정이라 시야가 조금 좁음";
+      return "두께·왜곡 이득이 부족";
+    }
+    if (key === "ff") return "가능하지만 지금 조합엔 비용 대비 이득 작음";
+    if (key === "das") return "여유는 있지만 과한 선택";
+    return "이 조합에선 체감 차이가 작음";
+  }
+
+  function renderCompare(r) {
+    var rec = r.designKey;
+    var now = document.getElementById("dcNow");
+    if (now) now.innerHTML = "<b>" + DESIGNS[rec].full + "</b> · 4단계 중 " + DESIGNS[rec].rank + "단계";
+    var grid = document.getElementById("dcGrid");
+    if (!grid) return;
+    var rows = [
+      { k: "두께", key: "thick" },
+      { k: "주변 왜곡", key: "dist", full: "주변부 왜곡 감소" },
+      { k: "시야감", key: "field" },
+      { k: "가격 부담", key: "price", burden: true }
+    ];
+    grid.innerHTML = DESIGN_ORDER.map(function (k) {
+      var d = DESIGNS[k];
+      var isPick = (k === rec);
+      var metrics = rows.map(function (row) {
+        var v = d[row.key];
+        var seg = "";
+        for (var i = 1; i <= 5; i++) {
+          seg += '<i class="' + (i <= v ? "on" : "") + (row.burden ? " burden" : "") + '"></i>';
+        }
+        return '<li role="img" aria-label="' + (row.full || row.k) + ' ' + v + '점 / 5점' + (row.burden ? ' (높을수록 비쌈)' : '') + '">' +
+          '<span class="dc-k">' + row.k + '</span>' +
+          '<span class="dc-bar" aria-hidden="true">' + seg + '</span></li>';
+      }).join("");
+      return '<article class="dc-card' + (isPick ? " is-pick" : "") + '"' + (isPick ? ' aria-current="true"' : "") + '>' +
+        '<div class="dc-top"><span class="dc-step">' + d.rank + '단계</span>' +
+        (isPick ? '<span class="dc-pick">현재 추천</span>' : "") + '</div>' +
+        '<h4>' + d.name + '</h4>' +
+        '<p class="dc-sub">' + d.sub + '</p>' +
+        '<ul class="dc-metrics">' + metrics + '</ul>' +
+        '<p class="dc-note">' + cardNote(k, rec, r.plano) + '</p>' +
+        '</article>';
+    }).join("");
+  }
+
+  function tipsFor(r) {
+    var out = [];
+    var high = r.pow >= 4.0;
+    if (state.frame === "normal") {
+      out.push(high
+        ? "고도수일수록 <b>렌즈 지름이 작은 테</b>가 유리합니다. 뿔테처럼 림이 두꺼운 모델은 측면 두께를 가려 줍니다."
+        : "이 정도 도수는 테 선택 폭이 넓습니다. 다만 큰 테를 고르면 가장자리 두께가 다시 올라가니 착용샷으로 확인하세요.");
+      out.push("<b>메탈테</b>는 렌즈 측면이 그대로 드러납니다. " + (r.sph > 0 ? "+4.00D 이상" : "-4.00D 이상") + "이면 1.67 이상을 쓰거나 측면 커버형 림을 고르세요.");
+      out.push("렌즈 무게는 앞쪽에 실립니다. 코받침 높이와 다리 길이를 조정해 <b>무게 중심</b>을 잡아야 흘러내리지 않습니다.");
+    } else if (state.frame === "goggle") {
+      out.push("고커브 테는 <b>프리폼 내면비구면(고커브 RX)</b>이 사실상 필수입니다. 일반 렌즈를 끼우면 주변부 왜곡·어지럼이 생깁니다.");
+      out.push(high
+        ? "고도수 + 고커브는 <b>제작 한계</b>가 있습니다. 렌즈가 테 밖으로 돌출되거나 빠질 수 있어, 커브가 낮은(4~6커브) 모델이 안전합니다."
+        : "고커브 테는 렌즈 두께가 테 앞뒤로 튀어나오기 쉽습니다. 림 두께가 있는 모델을 고르세요.");
+      out.push(Math.abs(r.cyl) >= 2
+        ? "난시 " + fmt(r.cyl) + "D는 렌즈가 조금만 돌아가도 축이 틀어져 어지럽습니다. <b>축 고정(스태빌라이제이션)</b> 가공 여부를 매장에 확인하세요."
+        : "착용 후 고개를 좌우로 돌려 주변부가 휘어 보이지 않는지 반드시 확인하세요. 고커브는 적응 기간이 필요합니다.");
+    } else {
+      out.push("<b>0~2커브 평면 테에는 저커브 전용 렌즈</b>가 필요합니다. 일반 4~6커브 렌즈를 억지로 끼우면 테가 벌어지고 렌즈가 들뜨며 유격이 생깁니다.");
+      out.push(high
+        ? "평면형이라도 고도수에서는 <b>렌즈 가장자리가 테 밖으로 돌출</b>됩니다. 림이 두껍고 렌즈 지름이 작은 모델을 고르세요."
+        : "평면형은 렌즈가 얇아 보이지만, 조립 후 나사·림 고정이 약해지기 쉬워 흔들림 점검이 필요합니다.");
+      out.push("플랫바형은 코받침 없이 얹히는 모델이 많습니다. 코 높이와 미끄럼 방지 패드까지 함께 확인하세요.");
+    }
+    if (r.sph > 0) {
+      out.push("원시는 테두리가 아니라 <b>중심 두께와 확대 왜곡</b>이 문제입니다. 작은 테 + 비구면이 정답에 가깝습니다.");
+    }
+    if (r.thickness >= 6) {
+      out.push("추정 두께가 " + r.thickness.toFixed(1) + "mm로 두꺼운 편입니다. 테를 한 단계 작게 줄이면 같은 렌즈로도 <b>1mm 이상</b> 얇아집니다.");
+    }
+    if (r.designKey === "ff") {
+      out.push("<b>프리폼은 피팅값이 곧 성능</b>입니다. 기존 안경의 틸트·정점거리를 그대로 베끼지 말고, 새 테를 착용한 상태에서 안점 높이·정점거리·전경각을 실측해 주문하세요.");
+    } else if (r.designKey === "das") {
+      out.push("양면비구면도 <b>조립 후 렌즈 회전</b>에 민감합니다. 난시 축과 광학중심이 맞는지 조립 후 한 번 더 확인하세요.");
+    }
+    return out;
+  }
+
+  function renderRisk(r) {
+    var items = [];
+    if (state.frame === "goggle" && r.pow >= 6) {
+      items.push("<b>고커브 + 고도수</b>: 제작 가능 업체가 제한되고, 렌즈 이탈·테 돌출 위험이 큽니다. 커브가 낮은 모델이나 1.67 이하 대안을 함께 검토하세요.");
+    }
+    if (state.frame === "goggle" && Math.abs(r.cyl) >= 2) {
+      items.push("<b>고커브 + 강한 난시</b>: 렌즈 회전 시 난시축이 어긋나 어지럼이 생깁니다. 축 고정 설계 여부를 반드시 확인하세요.");
+    }
+    if (state.size === "large" && r.pow >= 6) {
+      items.push("<b>오버사이즈 + 고도수</b>: " + (r.sph > 0 ? "중심 두께" : "테두리 두께") + "와 무게가 함께 급증합니다. 렌즈 지름이 작은 테로 바꾸는 것이 가장 확실한 해결책입니다.");
+    }
+    if (state.frame === "flat" && r.pow >= 5) {
+      items.push("<b>플랫바 + 고도수</b>: 렌즈 가장자리가 테 밖으로 돌출될 수 있습니다. 림 두께가 있는 모델을 권합니다.");
+    }
+    if (r.pick === "1.74" && state.frame === "goggle") {
+      items.push("<b>1.74 고커브</b>: 1.74는 고커브 전용 설계가 없는 경우가 많습니다. 1.67 + 작은 테 조합이 현실적인 대안입니다.");
+    }
+    if (r.designKey === "ff") {
+      items.push("<b>프리폼 주문 시</b>: PD뿐 아니라 <b>안점 높이·정점거리·전경각(틸트)·안면각</b>을 실측해야 이득이 살아납니다. 제작 기간(3~7일)과 재제작 비용이 일반 렌즈보다 큽니다.");
+    }
+    if (r.sph > 0 && r.pow >= 4) {
+      items.push("<b>고도 원시</b>: 중심 두께·무게가 커집니다. 렌즈 지름 축소와 비구면 설계를 우선하세요.");
+    }
+    if (Math.abs(r.dec) >= 3) {
+      items.push("<b>편심 " + sgnTxt(r.dec, 1) + "mm</b>: FPD(" + r.fpd + "mm)와 PD(" + r.pd + "mm) 차이가 큽니다. 광학중심을 " + Math.abs(r.dec).toFixed(1) + "mm " + (r.dec > 0 ? "귀쪽" : "코쪽") + "으로 옮겨야 해 렌즈 지름이 " + r.dia + "mm까지 커지고 테두리·무게가 늘어납니다. PD에 맞는 더 작은 테가 확실한 해법입니다.");
+    }
+    if (!items.length) {
+      items.push("특별한 제작 리스크는 낮은 조합입니다. 다만 실제 두께는 렌즈 블랭크 지름·가공 방식·테 형상에 따라 달라지니 매장에서 실물 샘플로 확인하세요.");
+    }
+    $("#riskBox").style.display = "";
+    $("#riskText").innerHTML = items.map(function (t) { return "<p>" + t + "</p>"; }).join("");
+  }
+
+  /* ---------------- 실제 안경 옆모습 & 테 장착 두께 ---------------- */
+  var RIM_HORN = 4.2;    // 일반 뿔테 림 앞뒤 두께(mm)
+  var RIM_METAL = 1.3;   // 얇은 메탈테 림 앞뒤 두께(mm)
+  var SIDE_VB = { w: 200, h: 102, x: 64, yc: 51 };
+  var SIDE_SY = 1.62;    // 세로(테 높이) px/mm — 실제 비율 유지
+  var SIDE_BUDGET = 39;  // 가장 두꺼운 앞뒤 두께를 39px 안에 맞춤(두께 축만 확대)
+
+  function lensHeightMm(A) { return 30 + (A - 44) * 0.85; }
+  function n1(v) { return (Math.round(v * 10) / 10).toFixed(1); }
+  function n2(v) { return (Math.round(v * 100) / 100).toFixed(2); }
+  function mmFmt(v) { return v < 0.05 ? "0" : n1(v); }
+  function f1(v) { return (Math.round(v * 10) / 10).toFixed(1); }
+
+  /* 렌즈 단면 형상: 가운데가 가장 두껍고 위아래로 얇아지는 슬리버 */
+  function lensShape(xF, xB, yT, yB, bow) {
+    var h = yB - yT;
+    return "M" + f1(xF + 1.2) + " " + f1(yT) +
+      "C" + f1(xF - bow) + " " + f1(yT + h * 0.26) + " " + f1(xF - bow) + " " + f1(yT + h * 0.74) + " " + f1(xF + 1.2) + " " + f1(yB) +
+      "L" + f1(xB - 1.2) + " " + f1(yB) +
+      "C" + f1(xB + bow) + " " + f1(yT + h * 0.74) + " " + f1(xB + bow) + " " + f1(yT + h * 0.26) + " " + f1(xB - 1.2) + " " + f1(yT) + "Z";
+  }
+
+  /* 옆에서 본 안경 — 앞(렌즈)은 왼쪽, 안경다리(템플)·귀걸이는 오른쪽
+     렌즈 실루엣을 먼저 깔고 그 위에 림(테)을 얹어, 림 밖으로 나온 부분만 주황으로 남긴다. */
+  function sideArt(g, sx) {
+    var isHorn = g.key === "horn";
+    var rimPx = Math.max(3.4, g.rim * sx);          // 림 앞뒤 두께
+    var lensPx = Math.max(3.4, g.wide * sx);        // 렌즈 가장자리 두께
+    var hPx = g.lensH * SIDE_SY;
+    var top = SIDE_VB.yc - hPx / 2;
+    var bot = top + hPx;
+    var cx = SIDE_VB.x;
+    var rxF = cx - rimPx / 2, rxB = cx + rimPx / 2;
+    var lxF = cx - lensPx / 2, lxB = cx + lensPx / 2;
+    var bow = 1.5;
+    var lp = lensShape(lxF, lxB, top + 1.5, bot - 1.5, bow);
+    var yT = top + Math.max(10, hPx * 0.2);
+    var padCy = bot - hPx * 0.28;
+    var gradId = "rg-" + g.key, clipId = "lc-" + g.key, holeId = "hl-" + g.key;
+    var lite = isHorn ? "#5a6b80" : "#f6f9fc";
+    var mid = isHorn ? "#2b3746" : "#c5d1dd";
+    var edge = isHorn ? "#141d27" : "#8393a6";
+    var rod = Math.min(rimPx / 2, 6.5);
+    var holeW = Math.max(2, rimPx * 0.46);
+    var holeX = cx - holeW / 2, holeY = top + 4.2, holeH = hPx - 8.4;
+    var out = [];
+
+    out.push('<defs><linearGradient id="' + gradId + '" x1="0" y1="0" x2="1" y2="0">' +
+      '<stop offset="0" stop-color="' + (isHorn ? "#1a2430" : "#9fb0c1") + '"/><stop offset=".26" stop-color="' + lite + '"/>' +
+      '<stop offset=".58" stop-color="' + mid + '"/><stop offset=".82" stop-color="' + (isHorn ? "#18212c" : "#aebccb") + '"/><stop offset="1" stop-color="' + (isHorn ? "#0f161e" : "#8e9dae") + '"/></linearGradient>' +
+      '<linearGradient id="' + holeId + '" x1="0" y1="0" x2="1" y2="0">' +
+      '<stop offset="0" stop-color="#b9d7f1"/><stop offset=".22" stop-color="#dcf0ff"/><stop offset=".62" stop-color="#c9e3f8"/><stop offset="1" stop-color="#a9cbe9"/></linearGradient>' +
+      '<linearGradient id="lg-' + g.key + '" x1="0" y1="0" x2="1" y2="0">' +
+      '<stop offset="0" stop-color="#ffe0a3"/><stop offset=".13" stop-color="#f6a70d"/><stop offset=".34" stop-color="#ffc352"/>' +
+      '<stop offset=".5" stop-color="#f09b06"/><stop offset=".66" stop-color="#ffc352"/><stop offset=".87" stop-color="#f6a70d"/><stop offset="1" stop-color="#ffe0a3"/></linearGradient>' +
+      '<clipPath id="' + clipId + '"><path d="' + lp + '"/></clipPath></defs>');
+
+    /* 1) 림 밖으로 나온 렌즈 — 가장 먼저 깔고, 위에 림을 얹어 가린다 */
+    if (g.prot > 0.05) {
+      out.push('<path d="' + lp + '" fill="url(#lg-' + g.key + ')" stroke="#b26a04" stroke-width="0.8"/>');
+    }
+
+    /* 2) 코받침 — 일체형 뿔테 패드 / 메탈 암 + 실리콘 패드 */
+    if (isHorn) {
+      out.push('<ellipse cx="' + f1(rxF - 2.5) + '" cy="' + f1(padCy) + '" rx="7.2" ry="10.5" fill="#5d6e83" stroke="#25303d" stroke-width="0.9"/>');
+      out.push('<path d="M' + f1(rxF - 6.4) + ' ' + f1(padCy - 6) + 'C' + f1(rxF - 7.6) + ' ' + f1(padCy) + ' ' + f1(rxF - 6.2) + ' ' + f1(padCy + 4.6) + ' ' + f1(rxF - 4.2) + ' ' + f1(padCy + 6.6) + '" fill="none" stroke="#cbd8e4" stroke-width="1.1" stroke-opacity=".35"/>');
+    } else {
+      out.push('<path d="M' + f1(rxF + 3.5) + ' ' + f1(padCy - 15) + 'L' + f1(rxF - 7.4) + ' ' + f1(padCy - 2) + '" fill="none" stroke="#8294a7" stroke-width="1.8" stroke-linecap="round"/>');
+      out.push('<ellipse cx="' + f1(rxF - 9) + '" cy="' + f1(padCy + 1.5) + '" rx="3.6" ry="8.2" fill="#dbe5ef" stroke="#71839a" stroke-width="0.9"/>');
+    }
+
+    /* 3) 림(테) — 앞뒤 두께 그대로. 가운데 구멍으로 렌즈 면이 보인다 */
+    out.push('<rect x="' + f1(rxF) + '" y="' + f1(top) + '" width="' + f1(rimPx) + '" height="' + f1(hPx) + '" rx="' + f1(rod) + '" fill="url(#' + gradId + ')" stroke="' + edge + '" stroke-width="1"/>');
+    out.push('<rect x="' + f1(holeX) + '" y="' + f1(holeY) + '" width="' + f1(holeW) + '" height="' + f1(holeH) + '" rx="' + f1(Math.min(holeW / 2, holeH / 2)) + '" fill="url(#' + holeId + ')" stroke="' + (isHorn ? "#1a2430" : "#8393a6") + '" stroke-width="0.7" stroke-opacity=".55"/>');
+    // 렌즈 면 하이라이트
+    out.push('<rect x="' + f1(holeX + holeW * 0.22) + '" y="' + f1(holeY + holeH * 0.12) + '" width="' + f1(Math.max(0.8, holeW * 0.2)) + '" height="' + f1(holeH * 0.5) + '" rx="' + f1(Math.max(0.4, holeW * 0.1)) + '" fill="#ffffff" fill-opacity=".5"/>');
+
+    /* 4) 림 끝선 — 어디까지가 림이고 어디부터 나온 부분인지 */
+    if (g.prot > 0.05) {
+      out.push('<line x1="' + f1(rxF) + '" y1="' + f1(top + 1.4) + '" x2="' + f1(rxF) + '" y2="' + f1(bot - 1.4) + '" stroke="#a96303" stroke-width="0.8" stroke-opacity=".7"/>');
+      out.push('<line x1="' + f1(rxB) + '" y1="' + f1(top + 1.4) + '" x2="' + f1(rxB) + '" y2="' + f1(bot - 1.4) + '" stroke="#a96303" stroke-width="0.8" stroke-opacity=".7"/>');
+    }
+
+    /* 5) 엔드피스 · 힌지 · 템플(안경다리) · 귀걸이 */
+    var tW = isHorn ? 8.6 : 4.2;
+    var bend = 156;
+    var tEnd = yT + 29;
+    out.push('<path d="M' + f1(rxB - 4) + ' ' + f1(top + 2) + 'L' + f1(rxB + 6) + ' ' + f1(yT - tW / 2 - 1.5) + 'L' + f1(rxB + 6) + ' ' + f1(yT + tW / 2 + 1.5) + 'L' + f1(rxB - 4) + ' ' + f1(yT + tW / 2 + 9) + 'Z" fill="' + (isHorn ? "#33404f" : "#c2cedb") + '" stroke="' + edge + '" stroke-width="0.7"/>');
+    out.push('<rect x="' + f1(rxB + 3) + '" y="' + f1(yT - tW / 2 - 2.4) + '" width="9" height="' + f1(tW + 4.8) + '" rx="2" fill="' + (isHorn ? "#3c4b5e" : "#cfd9e4") + '" stroke="' + edge + '" stroke-width="0.7"/>');
+    var tPath = 'M' + f1(rxB + 8) + ' ' + f1(yT) + 'L' + f1(bend - 13) + ' ' + f1(yT) + 'Q' + f1(bend) + ' ' + f1(yT) + ' ' + f1(bend) + ' ' + f1(yT + 12) + 'L' + f1(bend) + ' ' + f1(tEnd);
+    out.push('<path d="' + tPath + '" fill="none" stroke="' + edge + '" stroke-width="' + f1(tW + 1.1) + '" stroke-linecap="round" stroke-linejoin="round"/>');
+    out.push('<path d="' + tPath + '" fill="none" stroke="' + (isHorn ? "#3a4859" : "#cfd9e4") + '" stroke-width="' + tW + '" stroke-linecap="round" stroke-linejoin="round"/>');
+    out.push('<circle cx="' + f1(rxB + 7.5) + '" cy="' + f1(yT) + '" r="1.5" fill="#eaf1f8" stroke="' + edge + '" stroke-width="0.5"/>');
+    out.push('<path d="M' + f1(rxB + 10) + ' ' + f1(yT - tW / 2 + 1.4) + 'L' + f1(bend - 15) + ' ' + f1(yT - tW / 2 + 1.4) + '" fill="none" stroke="#eef5fc" stroke-width="' + (isHorn ? 1.6 : 1) + '" stroke-opacity=".26" stroke-linecap="round"/>');
+    out.push('<path d="M' + f1(bend) + ' ' + f1(tEnd - 9) + 'L' + f1(bend) + ' ' + f1(tEnd) + '" fill="none" stroke="' + (isHorn ? "#2a3644" : "#aebbc9") + '" stroke-width="' + f1(tW + 1.6) + '" stroke-linecap="round"/>');
+
+    return out.join("");
+  }
+
+  function renderSide(r) {
+    var prof = r.prof;
+    var wide = Math.max(prof.te, prof.tc);
+    var sx = SIDE_BUDGET / Math.max(wide, RIM_HORN);
+    var lensH = lensHeightMm(r.sizeA);
+    var isPlus = prof.mode === "plus";
+    var frames = [
+      { key: "horn", rim: RIM_HORN, name: "일반 뿔테" },
+      { key: "metal", rim: RIM_METAL, name: "얇은 메탈테" }
+    ];
+    var prot = [];
+
+    frames.forEach(function (f, i) {
+      f.wide = wide;
+      f.lensH = lensH;
+      f.prot = Math.max(0, wide - f.rim);
+      prot[i] = f.prot;
+
+      var art = document.querySelector('[data-art="' + f.key + '"]');
+      if (art) art.innerHTML = sideArt(f, sx);
+
+      var zero = f.prot < 0.05;
+      var badge = document.querySelector('[data-badge="' + f.key + '"]');
+      var vEl = document.querySelector('[data-badge-v="' + f.key + '"]');
+      var kEl = badge ? badge.querySelector(".k") : null;
+      var subEl = document.querySelector('[data-sub="' + f.key + '"]');
+
+      if (kEl) kEl.textContent = isPlus ? "중심 돌출" : "측면 노출";
+      if (vEl) vEl.innerHTML = mmFmt(f.prot) + "<small>mm</small>";
+      if (badge) badge.classList.toggle("is-zero", zero);
+      if (subEl) {
+        if (prof.mode === "plano") {
+          subEl.textContent = "도수 0.00 평면 단면 · 두께 " + n1(prof.te) + "mm" +
+            (zero ? " · 림 안에 묻힘" : " · 앞·뒤 각 " + n2(f.prot / 2) + "mm");
+        } else if (isPlus) {
+          subEl.textContent = "중심 " + n1(prof.tc) + "mm · 림 " + n1(f.rim) + "mm" +
+            (zero ? " · 림 안에 묻힘" : " · 앞·뒤 각 " + n2(f.prot / 2) + "mm");
+        } else {
+          subEl.textContent = zero
+            ? "앞·뒤 모두 림 안에 묻힘 · 노출 없음"
+            : "앞·뒤 각 " + n2(f.prot / 2) + "mm씩 드러남";
+        }
+      }
+      var svg = document.querySelector('.sc-card[data-side="' + f.key + '"] svg');
+      if (svg) {
+        svg.setAttribute("aria-label",
+          f.name + "를 옆에서 본 모습. 림 " + n1(f.rim) + "mm, 렌즈 " + (isPlus ? "중심 " : "테두리 ") + n1(wide) + "mm 중 " +
+          mmFmt(f.prot) + "mm가 림 밖으로 " + (zero ? "나오지 않음" : "나옴"));
+      }
+    });
+
+    // 요약 문장
+    var intro = document.getElementById("scIntro");
+    if (intro) {
+      var base = "PD <b>" + r.pd + "mm</b> · 편심 <b>" + sgnTxt(r.dec, 1) + "mm</b>(" + (Math.abs(r.dec) < 0.05 ? "중심 일치" : (r.dec > 0 ? "귀쪽" : "코쪽")) + ") 기준 — ";
+      if (prof.mode === "plano") {
+        intro.innerHTML = base + "도수 0.00 · 두께 <b>" + n1(prof.te) + "mm</b> 평면 단면입니다. 림 밖 노출은 뿔테 " +
+          mmFmt(prot[0]) + "mm, 메탈테 <b>" + mmFmt(prot[1]) + "mm</b>입니다.";
+      } else if (isPlus) {
+        intro.innerHTML = base + "추정 중심 <b>" + n1(prof.tc) + "mm</b> · 테두리 " + n1(prof.te) +
+          "mm. 중심부가 뿔테 <b>" + mmFmt(prot[0]) + "mm</b>, 메탈테 <b>" + mmFmt(prot[1]) + "mm</b> 앞뒤로 나옵니다.";
+      } else {
+        intro.innerHTML = base + "추정 최대 테두리 <b>" + n1(prof.te) + "mm</b> · 중심 " + n1(prof.tc) + "mm. " +
+          (prot[0] < 0.05
+            ? "뿔테(림 4.2mm)에는 <b>완전히 가려지고</b>, "
+            : "뿔테(림 4.2mm)에서는 <b>" + mmFmt(prot[0]) + "mm</b>만 드러나고, ") +
+          "메탈테(림 1.3mm)에서는 <b>" + mmFmt(prot[1]) + "mm</b>가 림 밖으로 나옵니다.";
+      }
+    }
+
+    // 프레임 형태별 참고 문구
+    var note = document.getElementById("scNote");
+    if (note) {
+      var noteBase = "<b>일반 뿔테(약 4.2mm) vs 얇은 메탈테(약 1.3mm) 기준 측면 노출 비교</b>입니다. ";
+      if (state.frame === "goggle") {
+        note.innerHTML = noteBase + "고글형은 앞면 커브가 커서 같은 도수라도 중심부가 더 도드라지고, 테 커브와 렌즈 커브가 어긋나면 측면 노출이 더 커집니다.";
+      } else if (state.frame === "flat") {
+        note.innerHTML = noteBase + "플랫바형은 커브가 낮아 가장자리 두께가 그대로 드러납니다. 렌즈 지름을 줄이거나 PD에 맞는 테를 고르는 쪽이 확실합니다.";
+      } else {
+        note.innerHTML = noteBase + "앞뒤 두께는 확대해 그린 모식도입니다. 실제 노출은 제품 림 형상(측면 커버형·반무테·홈파기)과 렌즈 가공 방식에 따라 달라집니다.";
+      }
+    }
+
+    // 복사용 요약
+    LAST_SIDE = "테 장착(PD " + r.pd + "mm · 편심 " + sgnTxt(r.dec, 1) + "mm): 뿔테(림 4.2mm) " + mmFmt(prot[0]) +
+      "mm · 메탈테(림 1.3mm) " + mmFmt(prot[1]) + "mm " + (isPlus ? "중심 돌출" : "측면 노출");
+  }
+
+  /* ---------------- 같은 PD · 테 크기별 두께 비교 ---------------- */
+  function renderSizeCompare(r) {
+    var body = document.getElementById("cmpBody");
+    if (!body) return;
+    var mode = r.prof.mode;
+    var tw = r.sph > 0 ? "중심 두께" : "최대 테두리";
+    body.innerHTML = ["small", "medium", "large"].map(function (k) {
+      var g = frameGeom(SIZES[k].lens, state.pd);
+      var th = edgeThick(g.rmax, r.pick, mode, r.pow);
+      var now = (k === state.size);
+      return '<div class="cmp-row' + (now ? " is-now" : "") + '" role="row"' + (now ? ' aria-current="true"' : "") + '>' +
+        '<span class="cn" role="cell">' + SIZES[k].cmp + '<small>' + SIZES[k].lens + 'mm 폭</small></span>' +
+        '<span class="cv" role="cell">' + g.fpd + '<small>mm</small></span>' +
+        '<span class="cv" role="cell">' + sgnTxt(g.dec, 1) + '<small>mm</small></span>' +
+        '<span class="cv" role="cell">' + th.toFixed(1) + '<small>mm</small></span>' +
+        '</div>';
+    }).join("");
+
+    var intro = document.getElementById("cmpIntro");
+    if (intro) {
+      intro.innerHTML = "브릿지 <b>18mm</b> · PD <b>" + state.pd + "mm</b> · 추천 " + r.pick + " 기준입니다. FPD = 렌즈 폭 + 18, d = (FPD − PD) ÷ 2.";
+    }
+
+    var note = document.getElementById("cmpNote");
+    if (note) {
+      var tS = edgeThick(frameGeom(SIZES.small.lens, state.pd).rmax, r.pick, mode, r.pow);
+      var tL = edgeThick(frameGeom(SIZES.large.lens, state.pd).rmax, r.pick, mode, r.pow);
+      note.innerHTML = "편심량 <b>+는 귀쪽, −는 코쪽</b> 편심입니다. " + tw + "는 광학중심에서 가장 먼 가장자리(A/2 + |d|) 기준이라, 같은 도수·PD에서도 테가 클수록 두꺼워집니다 — 작은 테 " +
+        n1(tS) + "mm → 큰 테 " + n1(tL) + "mm (차이 " + n1(tL - tS) + "mm).";
+    }
+  }
+
+  var LAST_SIDE = "";
+
+  /* ---------------- 이벤트 ---------------- */
+  var sphEl = $("#sph"), cylEl = $("#cyl"), pdEl = $("#pd");
+  var STEP_ELS = { sph: sphEl, cyl: cylEl, pd: pdEl };
+  var STEP_VALS = { sph: 0.25, cyl: 0.25, pd: 1 };
+
+  sphEl.addEventListener("input", function () {
+    state.sph = parseFloat(this.value);
+    render();
+  });
+  cylEl.addEventListener("input", function () {
+    state.cyl = parseFloat(this.value);
+    render();
+  });
+  pdEl.addEventListener("input", function () {
+    state.pd = parseInt(this.value, 10);
+    render();
+  });
+
+  document.querySelectorAll("#pdChips .chip").forEach(function (b) {
+    b.addEventListener("click", function () {
+      state.pd = parseInt(this.dataset.pd, 10);
+      pdEl.value = state.pd;
+      render();
+    });
+  });
+
+  document.querySelectorAll('input[name="frame"]').forEach(function (el) {
+    el.addEventListener("change", function () {
+      if (this.checked) { state.frame = this.value; render(); }
+    });
+  });
+  document.querySelectorAll('input[name="size"]').forEach(function (el) {
+    el.addEventListener("change", function () {
+      if (this.checked) { state.size = this.value; render(); }
+    });
+  });
+
+  document.querySelectorAll("#sphChips .chip").forEach(function (b) {
+    b.addEventListener("click", function () {
+      state.sph = parseFloat(this.dataset.sph);
+      sphEl.value = state.sph;
+      render();
+    });
+  });
+  document.querySelectorAll("#cylChips .chip").forEach(function (b) {
+    b.addEventListener("click", function () {
+      state.cyl = parseFloat(this.dataset.cyl);
+      cylEl.value = state.cyl;
+      render();
+    });
+  });
+
+  // 0.25D · 1mm 스텝 버튼: 경계에서 비활성화
+  function syncStepButtons() {
+    ["sph", "cyl", "pd"].forEach(function (key) {
+      var el = document.getElementById(key);
+      if (!el) return;
+      var min = parseFloat(el.min), max = parseFloat(el.max);
+      document.querySelectorAll('.step-btn[data-step="' + key + '"]').forEach(function (b) {
+        var dir = parseFloat(b.getAttribute("data-dir"));
+        var off = dir < 0 ? state[key] <= min + 1e-6 : state[key] >= max - 1e-6;
+        b.disabled = off;
+      });
+    });
+  }
+
+  document.querySelectorAll(".step-btn").forEach(function (b) {
+    b.addEventListener("click", function () {
+      var key = this.dataset.step;
+      var dir = parseFloat(this.dataset.dir);
+      var el = STEP_ELS[key];
+      if (!el) return;
+      var step = STEP_VALS[key] || 0.25;
+      var min = parseFloat(el.min), max = parseFloat(el.max);
+      var next = Math.min(max, Math.max(min, round(state[key] + dir * step, 2)));
+      state[key] = next;
+      el.value = next;
+      render();
+    });
+  });
+
+  // 복사
+  var toast = $("#toast"), toastTimer;
+  function showToast(msg) {
+    toast.textContent = msg;
+    toast.classList.add("show");
+    clearTimeout(toastTimer);
+    toastTimer = setTimeout(function () { toast.classList.remove("show"); }, 1600);
+  }
+  function summaryText() {
+    var r = compute();
+    return [
+      "[10초 렌즈 압축 계산 결과]",
+      "도수: SPH " + fmt(r.sph) + " / CYL " + fmt(r.cyl) + " (SE " + fmt(r.se) + ", 최대 " + fmt(r.sph + r.cyl) + ")",
+      "테: " + FRAMES[state.frame].label + " · " + SIZES[state.size].label + " (렌즈 폭 " + r.sizeA + "mm · PD " + r.pd + "mm)",
+      "FPD " + r.fpd + "mm · 편심 " + sgnTxt(r.dec, 1) + "mm(" + (r.dec >= 0 ? "귀쪽" : "코쪽") + ") · 렌즈 지름 " + r.dia + "mm",
+      "추천: " + r.pick + " + " + r.design + " — " + r.designSub,
+      "설계 단계: 4단계(구면<비구면<양면비구면<프리폼) 중 " + r.designStep + "단계",
+      (r.sph > 0 ? "중심" : "테두리") + " 두께 추정(최대): 약 " + r.thickness.toFixed(1) + "mm",
+      LAST_SIDE,
+      "※ 실제 두께는 렌즈 지름·가공 방식에 따라 달라집니다. 검안·조제 전 참고용."
+    ].join("\n");
+  }
+  $("#copyBtn").addEventListener("click", function () {
+    var text = summaryText();
+    if (navigator.clipboard && navigator.clipboard.writeText) {
+      navigator.clipboard.writeText(text).then(function () {
+        showToast("결과를 복사했습니다");
+      }).catch(function () { fallbackCopy(text); });
+    } else {
+      fallbackCopy(text);
+    }
+  });
+  function fallbackCopy(text) {
+    var ta = document.createElement("textarea");
+    ta.value = text;
+    ta.style.position = "fixed";
+    ta.style.top = "-1000px";
+    document.body.appendChild(ta);
+    ta.select();
+    try { document.execCommand("copy"); showToast("결과를 복사했습니다"); }
+    catch (e) { showToast("복사가 차단되었습니다"); }
+    document.body.removeChild(ta);
+  }
+
+  $("#resetBtn").addEventListener("click", function () {
+    state = { sph: DEFAULT.sph, cyl: DEFAULT.cyl, frame: DEFAULT.frame, size: DEFAULT.size, pd: DEFAULT.pd };
+    sphEl.value = state.sph;
+    cylEl.value = state.cyl;
+    pdEl.value = state.pd;
+    document.querySelector('input[name="frame"][value="normal"]').checked = true;
+    document.querySelector('input[name="size"][value="medium"]').checked = true;
+    render();
+    showToast("초기화했습니다");
+  });
+
+  // 파트너 링크 미설정 시 이동 방지 (시안 상태)
+  document.querySelectorAll(".p-card").forEach(function (a) {
+    a.addEventListener("click", function (e) {
+      if (this.getAttribute("href") === "#") {
+        e.preventDefault();
+        showToast("파트너스 링크를 넣으면 연결됩니다");
+      }
+    });
+  });
+
+  render();
+})();
+</script>
+</body>
+</html>
