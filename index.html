@@ -845,7 +845,7 @@
         <div class="field-head">
           <div>
             <span class="label" id="sizeLabel">테 크기 · PD</span>
-            <span class="label-sub">렌즈 폭 기준 · 브릿지 18mm 고정</span>
+            <span class="label-sub">렌즈 폭(A) 기준 · 브릿지는 아래에서 선택</span>
           </div>
         </div>
         <div class="size-grid" role="radiogroup" aria-labelledby="sizeLabel">
@@ -893,8 +893,34 @@
             <button type="button" class="chip" data-pd="66">66</button>
             <button type="button" class="chip" data-pd="68">68</button>
           </div>
-          <p class="pd-hint">편심량 <b>d = (FPD − PD) ÷ 2</b>, FPD는 <b>렌즈 폭 + 브릿지 18mm</b>입니다. PD가 FPD보다 짧으면 광학중심이 <b>귀쪽</b>으로 밀려 귀쪽 가장자리가 두꺼워집니다.</p>
+          <p class="pd-hint">편심량 <b>d = (FPD − PD) ÷ 2</b>, FPD는 <b>렌즈 폭 + 브릿지 <span id="pdHintBridge">18mm</span></b>입니다. PD가 FPD보다 짧으면 광학중심이 <b>귀쪽</b>으로 밀려 귀쪽 가장자리가 두꺼워집니다.</p>
         </div>
+      </div>
+
+      <!-- 브릿지(DBL) -->
+      <div class="field">
+        <div class="field-head">
+          <div>
+            <label for="bridge">브릿지 사이즈 (DBL)</label>
+            <span class="label-sub">렌즈 사이 다리 폭 · 14~24mm, 1mm 단위</span>
+          </div>
+          <output class="value-box" id="bridgeOut" for="bridge">18<small>mm</small></output>
+        </div>
+        <div class="step-row">
+          <button type="button" class="step-btn" data-step="bridge" data-dir="-1" aria-label="브릿지 1mm 줄이기"><b>−1</b><small>mm</small></button>
+          <input type="range" id="bridge" min="14" max="24" step="1" value="18" aria-describedby="bridgeScale">
+          <button type="button" class="step-btn" data-step="bridge" data-dir="1" aria-label="브릿지 1mm 늘리기"><b>+1</b><small>mm</small></button>
+        </div>
+        <div class="scale-row" id="bridgeScale"><span>← 14mm 좁은 편</span><span>넓은 편 24mm →</span></div>
+        <div class="chips chips-3" id="bridgeChips">
+          <button type="button" class="chip" data-bridge="16">16</button>
+          <button type="button" class="chip" data-bridge="17">17</button>
+          <button type="button" class="chip" data-bridge="18">18</button>
+          <button type="button" class="chip" data-bridge="19">19</button>
+          <button type="button" class="chip" data-bridge="20">20</button>
+          <button type="button" class="chip" data-bridge="21">21</button>
+        </div>
+        <p class="pd-hint">FPD = 렌즈 폭(A) + 브릿지. 브릿지가 넓을수록 FPD가 커져 PD와의 편심량 d도 커집니다. 안경 다리 안쪽에 <b>50□18</b>처럼 적힌 두 번째 숫자가 브릿지(mm)입니다.</p>
       </div>
     </section>
 
@@ -1195,7 +1221,7 @@
   "use strict";
 
   /* ---------------- 기준 데이터 ---------------- */
-  // 브릿지 폭 고정값(mm) — FPD = 렌즈 폭 + 18
+  // 브릿지 폭 기본값(mm) — 사용자가 14~24mm에서 고르면 state.bridge로 대체됨. FPD = 렌즈 폭 + 브릿지
   var BRIDGE = 18;
   // 테 크기: 렌즈 폭(mm)
   var SIZES = {
@@ -1231,8 +1257,8 @@
   };
   var DESIGN_ORDER = ["sph", "as", "das", "ff"];
 
-  var state = { sph: -6, cyl: -1.25, frame: "normal", size: "medium", pd: 63, index: "auto" };
-  var DEFAULT = { sph: -6, cyl: -1.25, frame: "normal", size: "medium", pd: 63, index: "auto" };
+  var state = { sph: -6, cyl: -1.25, frame: "normal", size: "medium", pd: 63, bridge: BRIDGE, index: "auto" };
+  var DEFAULT = { sph: -6, cyl: -1.25, frame: "normal", size: "medium", pd: 63, bridge: BRIDGE, index: "auto" };
 
   var $ = function (sel) { return document.querySelector(sel); };
 
@@ -1256,14 +1282,15 @@
   }
 
   /* ---------------- 안경원 편심 계산 ----------------
-     FPD = 렌즈 폭(A) + 브릿지 18mm
+     FPD = 렌즈 폭(A) + 브릿지(mm, 14~24에서 선택)
      d   = (FPD - PD) / 2   → +면 귀쪽, -면 코쪽으로 광학중심 이동
      r_max = A/2 + |d|      → 광학중심에서 가장 먼 가장자리 반지름 */
-  function frameGeom(A, pd) {
-    var fpd = A + BRIDGE;
+  function frameGeom(A, pd, bridge) {
+    var b = (bridge === undefined) ? (state.bridge || BRIDGE) : bridge;
+    var fpd = A + b;
     var dec = (fpd - pd) / 2;
     var rmax = A / 2 + Math.abs(dec);
-    return { A: A, fpd: fpd, dec: dec, rmax: rmax, dia: 2 * rmax };
+    return { A: A, fpd: fpd, dec: dec, rmax: rmax, dia: 2 * rmax, bridge: b };
   }
   // 가장 먼 가장자리(A/2+|d|)를 기준으로 한 두께(mm). 굴절률·단면 형태 반영
   function edgeThick(rmax, idx, mode, pow) {
@@ -1281,7 +1308,7 @@
     var size = SIZES[state.size];
     var frame = FRAMES[state.frame];
 
-    // 실제 안경원 편심 계산: 브릿지 18mm 고정
+    // 실제 안경원 편심 계산: 브릿지 18mm 고정 → 선택값(state.bridge)
     var geo = frameGeom(size.lens, state.pd);
     var dia = geo.dia;      // 필요한 렌즈 지름 = 2 · r_max
     var r = geo.rmax;       // 광학중심 → 가장 먼 가장자리
@@ -1358,6 +1385,7 @@
       n: chosen.n,
       dia: round(dia, 1),
       pd: state.pd,
+      bridge: geo.bridge,
       sizeA: size.lens,
       fpd: geo.fpd,
       dec: geo.dec,
@@ -1480,6 +1508,12 @@
     $("#sphOut").innerHTML = fmt(r.sph) + "<small>D</small>";
     $("#cylOut").innerHTML = fmt(r.cyl) + "<small>D</small>";
     $("#pdOut").innerHTML = state.pd + "<small>mm</small>";
+    $("#bridgeOut").innerHTML = state.bridge + "<small>mm</small>";
+    var pdHintBridge = document.getElementById("pdHintBridge");
+    if (pdHintBridge) pdHintBridge.textContent = state.bridge + "mm";
+    document.querySelectorAll("#bridgeChips .chip").forEach(function (b) {
+      b.setAttribute("aria-pressed", String(parseInt(b.dataset.bridge, 10) === state.bridge));
+    });
     document.querySelectorAll("#pdChips .chip").forEach(function (b) {
       b.setAttribute("aria-pressed", String(parseInt(b.dataset.pd, 10) === state.pd));
     });
@@ -1569,7 +1603,7 @@
     $("#fpdVal").innerHTML = r.fpd + "<small>mm</small>";
     $("#decKey").textContent = "편심량 d (" + (Math.abs(r.dec) < 0.05 ? "중심 일치" : (r.dec > 0 ? "귀쪽" : "코쪽")) + ")";
     $("#decVal").innerHTML = sgnTxt(r.dec, 1) + "<small>mm</small>";
-    $("#pdFormula").innerHTML = "브릿지 <b>18mm</b> 고정 · FPD = " + r.sizeA + "(A) + 18 = <b>" + r.fpd +
+    $("#pdFormula").innerHTML = "브릿지 <b>" + r.bridge + "mm</b> · FPD = " + r.sizeA + "(A) + " + r.bridge + " = <b>" + r.fpd +
       "mm</b> · d = (" + r.fpd + " − " + r.pd + ") ÷ 2 = <b>" + sgnTxt(r.dec, 1) + "mm</b> → " +
       (Math.abs(r.dec) < 0.05
         ? "광학중심이 테 중심과 일치"
@@ -1582,7 +1616,7 @@
     // 왜 이 조합인가
     var why = [];
     why.push("<b>등가도수 " + fmt(r.se) + "D · 최대 굴절력 " + fmt(r.sph + r.cyl) + "D</b> — " + yearLabel(r.sph) + " 구간입니다. 실제 두께는 등가도수가 아니라 가장 강한 경선(" + fmt(r.sph + r.cyl) + "D)이 결정하므로, 등가도수만 보면 두께를 과소평가하기 쉽습니다.");
-    why.push("브릿지 18mm · PD " + r.pd + "mm → FPD <span class='num'>" + r.fpd + "mm</span> · 편심 <span class='num'>" + sgnTxt(r.dec, 1) + "mm</span>(" + (Math.abs(r.dec) < 0.05 ? "중심" : (r.dec > 0 ? "귀쪽" : "코쪽")) + ")라서 광학중심에서 가장 먼 가장자리가 <span class='num'>" + r.rmax.toFixed(1) + "mm</span>입니다. 같은 도수에서도 작은 테(44mm) 대비 두께가 약 <span class='num'>" + r.frameGain + "%</span> 늘어나며, 두께는 반지름의 <b>제곱</b>에 비례합니다.");
+    why.push("브릿지 " + r.bridge + "mm · PD " + r.pd + "mm → FPD <span class='num'>" + r.fpd + "mm</span> · 편심 <span class='num'>" + sgnTxt(r.dec, 1) + "mm</span>(" + (Math.abs(r.dec) < 0.05 ? "중심" : (r.dec > 0 ? "귀쪽" : "코쪽")) + ")라서 광학중심에서 가장 먼 가장자리가 <span class='num'>" + r.rmax.toFixed(1) + "mm</span>입니다. 같은 도수에서도 작은 테(44mm) 대비 두께가 약 <span class='num'>" + r.frameGain + "%</span> 늘어나며, 두께는 반지름의 <b>제곱</b>에 비례합니다.");
     if (r.manual) {
       why.push("<b>" + r.pick + " 직접 선택</b> — 자동 추천은 <b>" + r.autoPick + "</b>이었습니다. 같은 도수·테 기준 " + (r.sph > 0 ? "중심" : "테두리") + " 두께가 <span class='num'>" + n1(r.autoThick) + "mm → " + n1(r.thickness) + "mm</span>로 바뀝니다. 아래 설계 추천은 굴절률과 무관하게 도수·테로 정해집니다.");
       why.push("<b>" + r.pick + "</b> 렌즈는 " + indexNote(r.pick) + (r.pick !== "1.56" && r.prof.mode !== "plano" ? " 1.56 대비 두께 약 <span class='num'>" + r.thinGain + "%</span> 얇습니다." : ""));
@@ -2004,7 +2038,7 @@
 
     var intro = document.getElementById("cmpIntro");
     if (intro) {
-      intro.innerHTML = "브릿지 <b>18mm</b> · PD <b>" + state.pd + "mm</b> · " + (r.manual ? "선택 " : "추천 ") + r.pick + " 기준입니다. FPD = 렌즈 폭 + 18, d = (FPD − PD) ÷ 2.";
+      intro.innerHTML = "브릿지 <b>" + r.bridge + "mm</b> · PD <b>" + state.pd + "mm</b> · " + (r.manual ? "선택 " : "추천 ") + r.pick + " 기준입니다. FPD = 렌즈 폭 + " + r.bridge + ", d = (FPD − PD) ÷ 2.";
     }
 
     var note = document.getElementById("cmpNote");
@@ -2019,9 +2053,9 @@
   var LAST_SIDE = "";
 
   /* ---------------- 이벤트 ---------------- */
-  var sphEl = $("#sph"), cylEl = $("#cyl"), pdEl = $("#pd");
-  var STEP_ELS = { sph: sphEl, cyl: cylEl, pd: pdEl };
-  var STEP_VALS = { sph: 0.25, cyl: 0.25, pd: 1 };
+  var sphEl = $("#sph"), cylEl = $("#cyl"), pdEl = $("#pd"), bridgeEl = $("#bridge");
+  var STEP_ELS = { sph: sphEl, cyl: cylEl, pd: pdEl, bridge: bridgeEl };
+  var STEP_VALS = { sph: 0.25, cyl: 0.25, pd: 1, bridge: 1 };
 
   sphEl.addEventListener("input", function () {
     state.sph = parseFloat(this.value);
@@ -2034,6 +2068,18 @@
   pdEl.addEventListener("input", function () {
     state.pd = parseInt(this.value, 10);
     render();
+  });
+  bridgeEl.addEventListener("input", function () {
+    state.bridge = parseInt(this.value, 10);
+    render();
+  });
+
+  document.querySelectorAll("#bridgeChips .chip").forEach(function (b) {
+    b.addEventListener("click", function () {
+      state.bridge = parseInt(this.dataset.bridge, 10);
+      bridgeEl.value = state.bridge;
+      render();
+    });
   });
 
   document.querySelectorAll("#pdChips .chip").forEach(function (b) {
@@ -2078,7 +2124,7 @@
 
   // 0.25D · 1mm 스텝 버튼: 경계에서 비활성화
   function syncStepButtons() {
-    ["sph", "cyl", "pd"].forEach(function (key) {
+    ["sph", "cyl", "pd", "bridge"].forEach(function (key) {
       var el = document.getElementById(key);
       if (!el) return;
       var min = parseFloat(el.min), max = parseFloat(el.max);
@@ -2118,7 +2164,7 @@
     return [
       "[10초 렌즈 압축 계산 결과]",
       "도수: SPH " + fmt(r.sph) + " / CYL " + fmt(r.cyl) + " (SE " + fmt(r.se) + ", 최대 " + fmt(r.sph + r.cyl) + ")",
-      "테: " + FRAMES[state.frame].label + " · " + SIZES[state.size].label + " (렌즈 폭 " + r.sizeA + "mm · PD " + r.pd + "mm)",
+      "테: " + FRAMES[state.frame].label + " · " + SIZES[state.size].label + " (렌즈 폭 " + r.sizeA + "mm · 브릿지 " + r.bridge + "mm · PD " + r.pd + "mm)",
       "FPD " + r.fpd + "mm · 편심 " + sgnTxt(r.dec, 1) + "mm(" + (r.dec >= 0 ? "귀쪽" : "코쪽") + ") · 렌즈 지름 " + r.dia + "mm",
       "굴절률: " + r.pick + (r.manual
         ? " (직접 선택 · 자동 추천 " + r.autoPick + " 대비 " + (r.thickDiff > 0.02 ? "+" + n1(r.thickDiff) + "mm 두꺼움" : (r.thickDiff < -0.02 ? "−" + n1(-r.thickDiff) + "mm 얇음" : "동일")) + ")"
@@ -2152,10 +2198,11 @@
   }
 
   $("#resetBtn").addEventListener("click", function () {
-    state = { sph: DEFAULT.sph, cyl: DEFAULT.cyl, frame: DEFAULT.frame, size: DEFAULT.size, pd: DEFAULT.pd, index: "auto" };
+    state = { sph: DEFAULT.sph, cyl: DEFAULT.cyl, frame: DEFAULT.frame, size: DEFAULT.size, pd: DEFAULT.pd, bridge: DEFAULT.bridge, index: "auto" };
     sphEl.value = state.sph;
     cylEl.value = state.cyl;
     pdEl.value = state.pd;
+    bridgeEl.value = state.bridge;
     document.querySelector('input[name="frame"][value="normal"]').checked = true;
     document.querySelector('input[name="size"][value="medium"]').checked = true;
     document.querySelector('input[name="nidx"][value="auto"]').checked = true;
