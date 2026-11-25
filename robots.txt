@@ -1,0 +1,13 @@
+# 안경두께 비교 · 렌즈 압축 계산기
+# https://bok08150-sudo.github.io/lens-calc/
+
+User-agent: *
+Allow: /
+
+User-agent: Googlebot
+Allow: /
+
+User-agent: Yeti
+Allow: /
+
+Sitemap: https://bok08150-sudo.github.io/lens-calc/sitemap.xml
