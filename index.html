@@ -282,28 +282,6 @@
   .frame-card:has(input:checked) svg{color:var(--brand)}
   .frame-card:has(input:focus-visible){outline:2px solid #9cc4e8;outline-offset:2px}
 
-  .size-grid{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:7px}
-  .size-card{
-    position:relative;display:block;cursor:pointer;
-    border:1.5px solid var(--line);border-radius:14px;background:#fff;
-    padding:10px 6px;text-align:center;
-    transition:border-color .15s,background .15s,box-shadow .15s;
-  }
-  .size-card input{position:absolute;opacity:0;pointer-events:none}
-  .size-dot{
-    display:block;height:22px;margin:0 auto 6px;
-    display:flex;align-items:center;justify-content:center;
-  }
-  .size-dot i{display:block;border:2.5px solid #97a4b4;border-radius:50% 50% 46% 46% / 44% 44% 56% 56%}
-  .size-card .sc-name{display:block;font-size:12.5px;font-weight:800;letter-spacing:-0.03em}
-  .size-card .sc-mm{display:block;font-size:10.5px;font-weight:600;color:var(--ink-3);margin-top:1px}
-  .size-card:has(input:checked){
-    border-color:var(--brand);background:#f6faff;
-    box-shadow:0 0 0 3px rgba(15,94,168,.09);
-  }
-  .size-card:has(input:checked) i{border-color:var(--brand)}
-  .size-card:has(input:focus-visible){outline:2px solid #9cc4e8;outline-offset:2px}
-
   .hint{
     margin:10px 0 0;padding:9px 11px;border-radius:10px;
     background:#f7f9fc;border:1px solid var(--line-2);
@@ -518,6 +496,8 @@
   .pd-field label{font-size:14px;font-weight:700;color:var(--ink)}
   .chips-3{grid-template-columns:repeat(3,minmax(0,1fr))}
   @media (min-width:600px){ .chips-3{grid-template-columns:repeat(6,minmax(0,1fr))} }
+  .chips-5{grid-template-columns:repeat(3,minmax(0,1fr))}
+  @media (min-width:520px){ .chips-5{grid-template-columns:repeat(5,minmax(0,1fr))} }
   .pd-hint{margin:10px 0 0;font-size:11px;line-height:1.58;color:var(--ink-3)}
   .pd-hint b{color:var(--ink-2);font-weight:700}
 
@@ -844,31 +824,25 @@
       <div class="field">
         <div class="field-head">
           <div>
-            <span class="label" id="sizeLabel">테 크기 · PD</span>
-            <span class="label-sub">렌즈 폭(A) 기준 · 브릿지는 아래에서 선택</span>
+            <label for="lens" id="sizeLabel">테 크기 · 렌즈 가로폭(A)</label>
+            <span class="label-sub">렌즈 한쪽 가로폭 · 40~64mm, 1mm 단위</span>
           </div>
+          <output class="value-box" id="lensOut" for="lens">50<small>mm</small></output>
         </div>
-        <div class="size-grid" role="radiogroup" aria-labelledby="sizeLabel">
-          <label class="size-card">
-            <input type="radio" name="size" value="small">
-            <span class="size-dot"><i style="width:17px;height:13px"></i></span>
-            <span class="sc-name">작음</span>
-            <span class="sc-mm">소형 · 44mm</span>
-          </label>
-          <label class="size-card">
-            <input type="radio" name="size" value="medium" checked>
-            <span class="size-dot"><i style="width:23px;height:16px"></i></span>
-            <span class="sc-name">보통</span>
-            <span class="sc-mm">중형 · 50mm</span>
-          </label>
-          <label class="size-card">
-            <input type="radio" name="size" value="large">
-            <span class="size-dot"><i style="width:29px;height:19px"></i></span>
-            <span class="sc-name">큼</span>
-            <span class="sc-mm">오버사이즈 · 56mm</span>
-          </label>
+        <div class="step-row">
+          <button type="button" class="step-btn" data-step="lens" data-dir="-1" aria-label="테 가로폭 1mm 줄이기"><b>−1</b><small>mm</small></button>
+          <input type="range" id="lens" min="40" max="64" step="1" value="50" aria-describedby="lensScale">
+          <button type="button" class="step-btn" data-step="lens" data-dir="1" aria-label="테 가로폭 1mm 늘리기"><b>+1</b><small>mm</small></button>
         </div>
-        <p class="hint">같은 도수라도 <b>테가 크고 PD가 짧을수록</b> 렌즈 중심에서 가장자리까지 거리가 멀어져 두께가 급격히 늘어납니다. 처방전 PD를 모르면 보통(63mm)을 선택하세요.</p>
+        <div class="scale-row" id="lensScale"><span>← 40mm 작은 편</span><span>큰 편 64mm →</span></div>
+        <div class="chips chips-5" id="lensChips">
+          <button type="button" class="chip" data-lens="44">작은 44</button>
+          <button type="button" class="chip" data-lens="48">중소 48</button>
+          <button type="button" class="chip" data-lens="50">보통 50</button>
+          <button type="button" class="chip" data-lens="52">여유 52</button>
+          <button type="button" class="chip" data-lens="56">큰 56</button>
+        </div>
+        <p class="hint">안경 다리 안쪽 <b>50□18</b> 표기의 첫 숫자가 렌즈 가로폭(A)입니다. 같은 도수라도 <b>테가 크고 PD가 짧을수록</b> 렌즈 중심에서 가장자리까지 거리가 멀어져 두께가 급격히 늘어납니다. 처방전 PD를 모르면 보통(63mm)을 선택하세요.</p>
 
         <!-- PD (동공간거리) -->
         <div class="pd-field">
@@ -1223,12 +1197,17 @@
   /* ---------------- 기준 데이터 ---------------- */
   // 브릿지 폭 기본값(mm) — 사용자가 14~24mm에서 고르면 state.bridge로 대체됨. FPD = 렌즈 폭 + 브릿지
   var BRIDGE = 18;
-  // 테 크기: 렌즈 폭(mm)
+  // 테 크기: 렌즈 가로폭(mm) — 3구간은 빠른 선택용 기본값
   var SIZES = {
     small:  { label: "작음", lens: 44, cmp: "작은 테" },
     medium: { label: "보통", lens: 50, cmp: "보통 테" },
     large:  { label: "큼",   lens: 56, cmp: "큰 테" }
   };
+  // 렌즈 가로폭(A) 기본값 — 입력 범위는 슬라이더(40~64mm)와 같다
+  var LENS_DEFAULT = SIZES.medium.lens;
+  // 굴절률·설계 분기에 쓰는 구간 판정(47mm 이하 작은 테, 54mm 이상 큰 테)
+  function lensKeyOf(A) { return A <= 47 ? "small" : (A >= 54 ? "large" : "medium"); }
+  function lensLabelOf(A) { return SIZES[lensKeyOf(A)].label; }
   // 프레임 형태별 두께 가중치
   var FRAMES = {
     normal: { label: "일반 안경테", f: 1.00 },
@@ -1257,8 +1236,8 @@
   };
   var DESIGN_ORDER = ["sph", "as", "das", "ff"];
 
-  var state = { sph: -6, cyl: -1.25, frame: "normal", size: "medium", pd: 63, bridge: BRIDGE, index: "auto" };
-  var DEFAULT = { sph: -6, cyl: -1.25, frame: "normal", size: "medium", pd: 63, bridge: BRIDGE, index: "auto" };
+  var state = { sph: -6, cyl: -1.25, frame: "normal", lens: LENS_DEFAULT, pd: 63, bridge: BRIDGE, index: "auto" };
+  var DEFAULT = { sph: -6, cyl: -1.25, frame: "normal", lens: LENS_DEFAULT, pd: 63, bridge: BRIDGE, index: "auto" };
 
   var $ = function (sel) { return document.querySelector(sel); };
 
@@ -1305,16 +1284,17 @@
     var sph = state.sph, cyl = state.cyl;
     var se = sph + cyl / 2;                 // 등가도수
     var pow = Math.abs(sph + cyl);          // 최대 굴절력 (최강 경선)
-    var size = SIZES[state.size];
+    var sizeA = state.lens;
+    var sizeKey = lensKeyOf(sizeA);
     var frame = FRAMES[state.frame];
 
     // 실제 안경원 편심 계산: 브릿지 18mm 고정 → 선택값(state.bridge)
-    var geo = frameGeom(size.lens, state.pd);
+    var geo = frameGeom(sizeA, state.pd);
     var dia = geo.dia;      // 필요한 렌즈 지름 = 2 · r_max
     var r = geo.rmax;       // 광학중심 → 가장 먼 가장자리
 
-    // 프레임 부하: 도수 × 테 크기 계수 × 형태 계수
-    var sizeF = dia / frameGeom(SIZES.medium.lens, state.pd).dia;
+    // 프레임 부하: 도수 × 테 크기 계수 × 형태 계수 (보통 테 50mm 기준)
+    var sizeF = dia / frameGeom(LENS_DEFAULT, state.pd).dia;
     var load = pow * sizeF * frame.f;
 
     // 굴절률 추천 (근시/원시 임계값 분리) — 접속자가 직접 고르면 그 값을 우선한다
@@ -1334,9 +1314,9 @@
 
     // 렌즈 설계 4단계: 도수(최대 굴절력·난시)와 테 형태/크기로 분기
     var plano = Math.abs(sph) < 0.25 && Math.abs(cyl) < 0.25;
-    var designKey = pickDesign(sph, cyl, state.frame, state.size);
+    var designKey = pickDesign(sph, cyl, state.frame, sizeKey);
     var design = DESIGNS[designKey].full;
-    var designSub = plano ? "도수 없음 · 설계 차이 없음" : designSubFor(designKey, state.frame, state.size);
+    var designSub = plano ? "도수 없음 · 설계 차이 없음" : designSubFor(designKey, state.frame, sizeKey);
     var sev = sevOf(sph, cyl);
 
     // 두께 추정: sag = D·r² / (2000·(n-1)) [mm]
@@ -1386,7 +1366,9 @@
       dia: round(dia, 1),
       pd: state.pd,
       bridge: geo.bridge,
-      sizeA: size.lens,
+      sizeA: sizeA,
+      sizeKey: sizeKey,
+      sizeLabel: lensLabelOf(sizeA),
       fpd: geo.fpd,
       dec: geo.dec,
       rmax: geo.rmax,
@@ -1509,6 +1491,10 @@
     $("#cylOut").innerHTML = fmt(r.cyl) + "<small>D</small>";
     $("#pdOut").innerHTML = state.pd + "<small>mm</small>";
     $("#bridgeOut").innerHTML = state.bridge + "<small>mm</small>";
+    $("#lensOut").innerHTML = state.lens + "<small>mm</small>";
+    document.querySelectorAll("#lensChips .chip").forEach(function (b) {
+      b.setAttribute("aria-pressed", String(parseInt(b.dataset.lens, 10) === state.lens));
+    });
     var pdHintBridge = document.getElementById("pdHintBridge");
     if (pdHintBridge) pdHintBridge.textContent = state.bridge + "mm";
     document.querySelectorAll("#bridgeChips .chip").forEach(function (b) {
@@ -1582,7 +1568,7 @@
       var dTxt = r.designKey === "ff"
         ? "프리폼으로 커브·착용값까지 맞춰 주변부 왜곡을 잡는"
         : (r.designKey === "das" ? "양면비구면으로 주변부 왜곡까지 줄이는" : "비구면으로 주변부 왜곡까지 줄이는");
-      line = "<b>" + yearLabel(r.sph) + " + " + FRAMES[state.frame].label + "·" + SIZES[state.size].label + " 테</b> 조합입니다. <b>1.67</b>로 테두리를 잡고 " + dTxt + " 조합이 가장 무난합니다.";
+      line = "<b>" + yearLabel(r.sph) + " + " + FRAMES[state.frame].label + "·" + r.sizeLabel + "(" + r.sizeA + "mm) 테</b> 조합입니다. <b>1.67</b>로 테두리를 잡고 " + dTxt + " 조합이 가장 무난합니다.";
     } else if (r.pick === "1.60") {
       line = "<b>" + yearLabel(r.sph) + "</b> 구간입니다. <b>1.60</b>은 1.56보다 확실히 얇으면서 아베수(41)가 높아, 선명도와 가격의 균형점입니다.";
     } else {
@@ -1813,7 +1799,7 @@
     if (state.frame === "goggle" && Math.abs(r.cyl) >= 2) {
       items.push("<b>고커브 + 강한 난시</b>: 렌즈 회전 시 난시축이 어긋나 어지럼이 생깁니다. 축 고정 설계 여부를 반드시 확인하세요.");
     }
-    if (state.size === "large" && r.pow >= 6) {
+    if (r.sizeKey === "large" && r.pow >= 6) {
       items.push("<b>오버사이즈 + 고도수</b>: " + (r.sph > 0 ? "중심 두께" : "테두리 두께") + "와 무게가 함께 급증합니다. 렌즈 지름이 작은 테로 바꾸는 것이 가장 확실한 해결책입니다.");
     }
     if (state.frame === "flat" && r.pow >= 5) {
@@ -2024,12 +2010,16 @@
     if (!body) return;
     var mode = r.prof.mode;
     var tw = r.sph > 0 ? "중심 두께" : "최대 테두리";
-    body.innerHTML = ["small", "medium", "large"].map(function (k) {
-      var g = frameGeom(SIZES[k].lens, state.pd);
+    // 기준 구간(44·48·52·56mm) + 지금 고른 가로폭을 함께 비교
+    var rows = [44, 48, 52, 56];
+    if (rows.indexOf(r.sizeA) < 0) rows.push(r.sizeA);
+    rows.sort(function (a, b) { return a - b; });
+    body.innerHTML = rows.map(function (a) {
+      var g = frameGeom(a, state.pd);
       var th = edgeThick(g.rmax, r.pick, mode, r.pow);
-      var now = (k === state.size);
+      var now = (a === r.sizeA);
       return '<div class="cmp-row' + (now ? " is-now" : "") + '" role="row"' + (now ? ' aria-current="true"' : "") + '>' +
-        '<span class="cn" role="cell">' + SIZES[k].cmp + '<small>' + SIZES[k].lens + 'mm 폭</small></span>' +
+        '<span class="cn" role="cell">' + (now ? "내 테" : SIZES[lensKeyOf(a)].cmp) + '<small>' + a + 'mm 폭</small></span>' +
         '<span class="cv" role="cell">' + g.fpd + '<small>mm</small></span>' +
         '<span class="cv" role="cell">' + sgnTxt(g.dec, 1) + '<small>mm</small></span>' +
         '<span class="cv" role="cell">' + th.toFixed(1) + '<small>mm</small></span>' +
@@ -2053,9 +2043,9 @@
   var LAST_SIDE = "";
 
   /* ---------------- 이벤트 ---------------- */
-  var sphEl = $("#sph"), cylEl = $("#cyl"), pdEl = $("#pd"), bridgeEl = $("#bridge");
-  var STEP_ELS = { sph: sphEl, cyl: cylEl, pd: pdEl, bridge: bridgeEl };
-  var STEP_VALS = { sph: 0.25, cyl: 0.25, pd: 1, bridge: 1 };
+  var sphEl = $("#sph"), cylEl = $("#cyl"), pdEl = $("#pd"), bridgeEl = $("#bridge"), lensEl = $("#lens");
+  var STEP_ELS = { sph: sphEl, cyl: cylEl, pd: pdEl, bridge: bridgeEl, lens: lensEl };
+  var STEP_VALS = { sph: 0.25, cyl: 0.25, pd: 1, bridge: 1, lens: 1 };
 
   sphEl.addEventListener("input", function () {
     state.sph = parseFloat(this.value);
@@ -2072,6 +2062,18 @@
   bridgeEl.addEventListener("input", function () {
     state.bridge = parseInt(this.value, 10);
     render();
+  });
+  lensEl.addEventListener("input", function () {
+    state.lens = parseInt(this.value, 10);
+    render();
+  });
+
+  document.querySelectorAll("#lensChips .chip").forEach(function (b) {
+    b.addEventListener("click", function () {
+      state.lens = parseInt(this.dataset.lens, 10);
+      lensEl.value = state.lens;
+      render();
+    });
   });
 
   document.querySelectorAll("#bridgeChips .chip").forEach(function (b) {
@@ -2095,12 +2097,6 @@
       if (this.checked) { state.frame = this.value; render(); }
     });
   });
-  document.querySelectorAll('input[name="size"]').forEach(function (el) {
-    el.addEventListener("change", function () {
-      if (this.checked) { state.size = this.value; render(); }
-    });
-  });
-
   document.querySelectorAll('input[name="nidx"]').forEach(function (el) {
     el.addEventListener("change", function () {
       if (this.checked) { state.index = this.value; render(); }
@@ -2124,7 +2120,7 @@
 
   // 0.25D · 1mm 스텝 버튼: 경계에서 비활성화
   function syncStepButtons() {
-    ["sph", "cyl", "pd", "bridge"].forEach(function (key) {
+    ["sph", "cyl", "pd", "bridge", "lens"].forEach(function (key) {
       var el = document.getElementById(key);
       if (!el) return;
       var min = parseFloat(el.min), max = parseFloat(el.max);
@@ -2164,7 +2160,7 @@
     return [
       "[10초 렌즈 압축 계산 결과]",
       "도수: SPH " + fmt(r.sph) + " / CYL " + fmt(r.cyl) + " (SE " + fmt(r.se) + ", 최대 " + fmt(r.sph + r.cyl) + ")",
-      "테: " + FRAMES[state.frame].label + " · " + SIZES[state.size].label + " (렌즈 폭 " + r.sizeA + "mm · 브릿지 " + r.bridge + "mm · PD " + r.pd + "mm)",
+      "테: " + FRAMES[state.frame].label + " · " + r.sizeLabel + " 테 (렌즈 가로폭 " + r.sizeA + "mm · 브릿지 " + r.bridge + "mm · PD " + r.pd + "mm)",
       "FPD " + r.fpd + "mm · 편심 " + sgnTxt(r.dec, 1) + "mm(" + (r.dec >= 0 ? "귀쪽" : "코쪽") + ") · 렌즈 지름 " + r.dia + "mm",
       "굴절률: " + r.pick + (r.manual
         ? " (직접 선택 · 자동 추천 " + r.autoPick + " 대비 " + (r.thickDiff > 0.02 ? "+" + n1(r.thickDiff) + "mm 두꺼움" : (r.thickDiff < -0.02 ? "−" + n1(-r.thickDiff) + "mm 얇음" : "동일")) + ")"
@@ -2198,13 +2194,13 @@
   }
 
   $("#resetBtn").addEventListener("click", function () {
-    state = { sph: DEFAULT.sph, cyl: DEFAULT.cyl, frame: DEFAULT.frame, size: DEFAULT.size, pd: DEFAULT.pd, bridge: DEFAULT.bridge, index: "auto" };
+    state = { sph: DEFAULT.sph, cyl: DEFAULT.cyl, frame: DEFAULT.frame, lens: DEFAULT.lens, pd: DEFAULT.pd, bridge: DEFAULT.bridge, index: "auto" };
     sphEl.value = state.sph;
     cylEl.value = state.cyl;
     pdEl.value = state.pd;
     bridgeEl.value = state.bridge;
+    lensEl.value = state.lens;
     document.querySelector('input[name="frame"][value="normal"]').checked = true;
-    document.querySelector('input[name="size"][value="medium"]').checked = true;
     document.querySelector('input[name="nidx"][value="auto"]').checked = true;
     render();
     showToast("초기화했습니다");
