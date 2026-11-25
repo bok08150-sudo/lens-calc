@@ -222,6 +222,46 @@
   }
   .chip[aria-pressed="true"]:hover{background:#0d5396}
 
+  /* refractive index picker */
+  .nidx-grid{display:grid;grid-template-columns:1.3fr repeat(4,minmax(0,1fr));gap:6px}
+  .nidx{
+    position:relative;display:block;cursor:pointer;text-align:center;
+    border:1.5px solid var(--line);border-radius:12px;background:#fff;
+    padding:8px 2px 7px;
+    transition:border-color .15s,background .15s,box-shadow .15s;
+  }
+  .nidx input{position:absolute;opacity:0;pointer-events:none}
+  .nidx .nx-name{
+    display:block;font-size:11.5px;font-weight:800;letter-spacing:-0.04em;
+    color:var(--ink);white-space:nowrap;
+  }
+  .nidx .nx-mm{
+    display:block;margin-top:2px;
+    font-size:9.5px;font-weight:700;letter-spacing:-0.02em;
+    color:var(--ink-3);font-variant-numeric:tabular-nums;white-space:nowrap;
+  }
+  .nidx:hover{border-color:#c7d2df;background:#fafbfd}
+  .nidx:has(input:checked){
+    border-color:var(--brand);background:#f6faff;
+    box-shadow:0 0 0 3px rgba(15,94,168,.09);
+  }
+  .nidx:has(input:checked) .nx-name{color:#0b4a86}
+  .nidx:has(input:checked) .nx-mm{color:#0b4a86}
+  .nidx:has(input:focus-visible){outline:2px solid #9cc4e8;outline-offset:2px}
+  .nidx.is-rec .nx-mm{color:var(--brand);font-weight:800}
+  .nidx.is-rec::after{
+    content:"";position:absolute;top:4px;right:4px;
+    width:5px;height:5px;border-radius:50%;background:var(--brand);
+  }
+  .nidx:has(input:checked).is-rec::after{background:#fff}
+  .nidx-hint{margin:9px 0 0;font-size:11px;line-height:1.58;color:var(--ink-3)}
+  .nidx-hint b{color:var(--ink-2);font-weight:800}
+  @media (min-width:600px){
+    .nidx .nx-name{font-size:12.5px}
+    .nidx .nx-mm{font-size:10px}
+    .nidx-hint{font-size:11.5px}
+  }
+
   /* frame cards */
   .frame-grid{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:7px}
   .frame-card{
@@ -512,7 +552,8 @@
   .partner-head h2{margin:0;font-size:15px;font-weight:800;letter-spacing:-0.02em}
   .partner-head p{margin:0;font-size:11.5px;color:var(--ink-3)}
   .partner-grid{display:grid;gap:10px;grid-template-columns:1fr}
-  @media (min-width:720px){ .partner-grid{grid-template-columns:repeat(3,minmax(0,1fr));gap:12px} }
+  @media (min-width:520px){ .partner-grid{grid-template-columns:repeat(2,minmax(0,1fr));gap:10px} }
+  @media (min-width:880px){ .partner-grid{grid-template-columns:repeat(3,minmax(0,1fr));gap:12px} }
   .p-card{
     display:flex;gap:12px;align-items:stretch;
     background:#fff;border:1px solid var(--line);border-radius:16px;
@@ -719,6 +760,45 @@
         </div>
       </div>
 
+      <!-- 굴절률 선택 -->
+      <div class="field">
+        <div class="field-head">
+          <div>
+            <span class="label" id="nidxLabel">굴절률 선택</span>
+            <span class="label-sub">직접 고르면 그 렌즈 기준으로 두께·옆모습이 바뀝니다</span>
+          </div>
+          <output class="value-box" id="nidxOut">1.67<small>추천</small></output>
+        </div>
+        <div class="nidx-grid" role="radiogroup" aria-labelledby="nidxLabel">
+          <label class="nidx">
+            <input type="radio" name="nidx" value="auto" checked>
+            <span class="nx-name">자동 추천</span>
+            <span class="nx-mm" data-nmm="auto">5.1mm</span>
+          </label>
+          <label class="nidx">
+            <input type="radio" name="nidx" value="1.56">
+            <span class="nx-name">1.56</span>
+            <span class="nx-mm" data-nmm="1.56">5.9mm</span>
+          </label>
+          <label class="nidx">
+            <input type="radio" name="nidx" value="1.60">
+            <span class="nx-name">1.60</span>
+            <span class="nx-mm" data-nmm="1.60">5.6mm</span>
+          </label>
+          <label class="nidx">
+            <input type="radio" name="nidx" value="1.67">
+            <span class="nx-name">1.67</span>
+            <span class="nx-mm" data-nmm="1.67">5.1mm</span>
+          </label>
+          <label class="nidx">
+            <input type="radio" name="nidx" value="1.74">
+            <span class="nx-name">1.74</span>
+            <span class="nx-mm" data-nmm="1.74">4.7mm</span>
+          </label>
+        </div>
+        <p class="nidx-hint" id="nidxHint">도수·테 기준 자동 추천은 <b>1.67</b>입니다. 다른 굴절률을 누르면 두께와 옆모습이 바로 바뀝니다.</p>
+      </div>
+
       <!-- frame shape -->
       <div class="field">
         <div class="field-head">
@@ -824,7 +904,7 @@
 
       <div class="verdict">
         <div class="verdict-top">
-          <span class="tag">추천 굴절률</span>
+          <span class="tag" id="idxTag">추천 굴절률</span>
           <span class="badge" id="badge">두께·가성비 균형</span>
         </div>
         <div class="verdict-main">
@@ -987,16 +1067,19 @@
   <section class="partner" aria-labelledby="partnerTitle">
     <div class="partner-head">
       <h2 id="partnerTitle">안경 관리, 이거면 끝</h2>
-      <p>렌즈 오래 쓰는 사람들이 실제로 쓰는 용품</p>
+      <p>안경 오래 쓰는 사람들이 실제로 쓰는 용품</p>
     </div>
 
     <!--
       =====================================================================
       [쿠팡 파트너스 링크 삽입 위치]
-      아래 3개 카드의 <a class="p-card" href="여기에_파트너스_링크"> 만 바꾸면 됩니다.
-      - 초음파 세척기  : href="https://link.coupang.com/..." (본인 파트너스 링크)
-      - 김서림 방지제  : href="https://link.coupang.com/..."
+      아래 6개 카드의 <a class="p-card" href="여기에_파트너스_링크"> 만 바꾸면 됩니다.
+      - 초음파 세척기 : href="https://link.coupang.com/..." (본인 파트너스 링크)
+      - 김서림 방지제 : href="https://link.coupang.com/..."
       - 실리콘 코받침 : href="https://link.coupang.com/..."
+      - AI 스마트 글래스 : href="https://link.coupang.com/..."
+      - 하드 안경케이스 : href="https://link.coupang.com/..."
+      - 안경줄(스트랩) : href="https://link.coupang.com/..."
       썸네일은 <div class="p-thumb"> 안에 <img src="상품이미지URL" alt="상품명">
       를 넣거나, 파트너스 상품 이미지 태그로 교체하세요.
       rel="sponsored nofollow noopener" target="_blank" 는 유지하는 것을 권장합니다.
@@ -1044,6 +1127,51 @@
           <span class="p-cat">착용감</span>
           <p class="p-name">실리콘 코받침 · 귀팁</p>
           <p class="p-desc">흘러내림·귀 통증 잡는 소모품</p>
+          <span class="p-link">쿠팡에서 보기</span>
+        </div>
+      </a>
+
+      <!-- SLOT 4: AI 스마트 글래스 -->
+      <a class="p-card" href="https://link.coupang.com/a/iXC3QbnPzM" data-slot="ai-glasses" target="_blank" rel="sponsored nofollow noopener">
+        <div class="p-thumb">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+            <rect x="2.5" y="9.5" width="8" height="5.5" rx="2.2"/><rect x="13.5" y="9.5" width="8" height="5.5" rx="2.2"/><path d="M10.5 11.6c1-.7 2-.7 3 0"/><path d="M6.5 9.5V7.5"/><path d="M17.5 9.5V7.5"/><path d="M20 5.2c1 .8 1.6 1.7 1.6 2.6"/>
+          </svg>
+        </div>
+        <div class="p-body">
+          <span class="p-cat">스마트</span>
+          <p class="p-name">AI 스마트 글래스</p>
+          <p class="p-desc">블루투스 오디오·번역, 안경처럼 착용</p>
+          <span class="p-link">쿠팡에서 보기</span>
+        </div>
+      </a>
+
+      <!-- SLOT 5: 하드 안경케이스 -->
+      <a class="p-card" href="https://link.coupang.com/a/iXC67gL7xQ" data-slot="case" target="_blank" rel="sponsored nofollow noopener">
+        <div class="p-thumb">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+            <path d="M3 9.5c0-1.4 1.1-2.5 2.5-2.5h13c1.4 0 2.5 1.1 2.5 2.5v5.7c0 1.8-1.4 3.3-3.2 3.3H6.2C4.4 18.5 3 17 3 15.2Z"/><path d="M3 10.8h18"/><path d="M9.6 5.2h4.8"/>
+          </svg>
+        </div>
+        <div class="p-body">
+          <span class="p-cat">보관</span>
+          <p class="p-name">하드 안경케이스</p>
+          <p class="p-desc">가방 속 눌림·기스 막는 하드 케이스</p>
+          <span class="p-link">쿠팡에서 보기</span>
+        </div>
+      </a>
+
+      <!-- SLOT 6: 안경줄(스트랩) -->
+      <a class="p-card" href="https://link.coupang.com/a/iXDbnOl9pI" data-slot="strap" target="_blank" rel="sponsored nofollow noopener">
+        <div class="p-thumb">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+            <circle cx="7" cy="9" r="3"/><path d="M10 9h4"/><path d="M14 9c3 0 4 2.6 4 5.5V19"/><circle cx="18" cy="20.2" r="1"/><path d="M4.6 11.4 5.6 20"/>
+          </svg>
+        </div>
+        <div class="p-body">
+          <span class="p-cat">분실방지</span>
+          <p class="p-name">안경줄 스트랩</p>
+          <p class="p-desc">벗어도 목에 걸어 두는 실리콘 줄</p>
           <span class="p-link">쿠팡에서 보기</span>
         </div>
       </a>
@@ -1103,8 +1231,8 @@
   };
   var DESIGN_ORDER = ["sph", "as", "das", "ff"];
 
-  var state = { sph: -6, cyl: -1.25, frame: "normal", size: "medium", pd: 63 };
-  var DEFAULT = { sph: -6, cyl: -1.25, frame: "normal", size: "medium", pd: 63 };
+  var state = { sph: -6, cyl: -1.25, frame: "normal", size: "medium", pd: 63, index: "auto" };
+  var DEFAULT = { sph: -6, cyl: -1.25, frame: "normal", size: "medium", pd: 63, index: "auto" };
 
   var $ = function (sel) { return document.querySelector(sel); };
 
@@ -1162,18 +1290,20 @@
     var sizeF = dia / frameGeom(SIZES.medium.lens, state.pd).dia;
     var load = pow * sizeF * frame.f;
 
-    // 굴절률 추천 (근시/원시 임계값 분리)
-    var pick;
+    // 굴절률 추천 (근시/원시 임계값 분리) — 접속자가 직접 고르면 그 값을 우선한다
+    var autoPick;
     if (sph > 0) {
-      if (load < 2.5) pick = "1.56";
-      else if (load < 4.5) pick = "1.60";
-      else pick = "1.67";
+      if (load < 2.5) autoPick = "1.56";
+      else if (load < 4.5) autoPick = "1.60";
+      else autoPick = "1.67";
     } else {
-      if (load < 2.5) pick = "1.56";
-      else if (load < 5.0) pick = "1.60";
-      else if (load < 8.5) pick = "1.67";
-      else pick = "1.74";
+      if (load < 2.5) autoPick = "1.56";
+      else if (load < 5.0) autoPick = "1.60";
+      else if (load < 8.5) autoPick = "1.67";
+      else autoPick = "1.74";
     }
+    var manual = state.index !== "auto";
+    var pick = manual ? state.index : autoPick;
 
     // 렌즈 설계 4단계: 도수(최대 굴절력·난시)와 테 형태/크기로 분기
     var plano = Math.abs(sph) < 0.25 && Math.abs(cyl) < 0.25;
@@ -1205,6 +1335,11 @@
     };
     var shownThick = mode === "plus" ? prof.tc : prof.te; // 통계 카드에 보여줄 두께(근시=테두리, 원시=중심)
 
+    // 자동 추천 굴절률과의 두께 차이(같은 도수·테 기준)
+    var autoSag = (pow * r * r) / (2000 * (INDEX[autoPick].n - 1));
+    var autoThick = mode === "plus" ? round(1.2 + autoSag, 2) : (mode === "plano" ? 1.5 : round(1.0 + autoSag, 2));
+    var thickDiff = round(shownThick - autoThick, 2);
+
     // 소형 테 대비 두께 증가율
     var rSmall = frameGeom(SIZES.small.lens, state.pd).rmax;
     var frameGain = (r * r) / (rSmall * rSmall) - 1;
@@ -1212,6 +1347,7 @@
     return {
       sph: sph, cyl: cyl, se: se, pow: pow, sev: sev, plano: plano,
       load: load, pick: pick,
+      autoPick: autoPick, manual: manual, autoThick: autoThick, thickDiff: thickDiff,
       designKey: designKey, design: design, designSub: designSub,
       designStep: DESIGNS[designKey].rank,
       thickness: round(shownThick, 1),
@@ -1296,10 +1432,44 @@
     return "고도 근시";
   }
   function badgeText(r) {
+    if (r.manual) {
+      if (r.prof.mode === "plano") return "도수 0.00 · 두께 동일";
+      if (Math.abs(r.thickDiff) < 0.05) return "자동 추천과 동일";
+      return r.thickDiff > 0
+        ? "추천보다 " + n1(r.thickDiff) + "mm 두꺼움"
+        : "추천보다 " + n1(-r.thickDiff) + "mm 얇음";
+    }
     if (r.pick === "1.74") return "최대 압축 필요";
     if (r.pick === "1.67") return "두께·가성비 균형";
     if (r.pick === "1.60") return "표준보다 한 단계 얇게";
     return "과하지 않게, 가성비 우선";
+  }
+
+  /* 굴절률별 성격 한 줄 — 직접 선택했을 때의 코멘트 */
+  function indexNote(pick) {
+    if (pick === "1.56") return "아베수 36으로 색수차가 가장 적고 가격이 가장 낮은 대신, 이 도수에서는 테두리가 가장 두껍습니다.";
+    if (pick === "1.60") return "아베수 41로 색수차가 적고 두께·가격 균형이 좋은 표준 상위 굴절률입니다.";
+    if (pick === "1.67") return "고도수에서 가격 대비 두께 이득이 가장 큰 지점입니다.";
+    return "가장 얇지만 가격이 크게 오르고, 고커브·특수 렌즈는 라인업이 적습니다.";
+  }
+
+  /* 직접 선택한 굴절률 요약 문장 */
+  function manualLine(r) {
+    var tw = r.sph > 0 ? "중심" : "테두리";
+    var cmp;
+    if (r.prof.mode === "plano") {
+      cmp = " 도수가 0.00이라 굴절률을 바꿔도 두께는 1.5mm 평면 단면으로 같습니다.";
+    } else if (r.pick === r.autoPick) {
+      cmp = " 자동 추천과 같은 굴절률이라 두께도 " + n1(r.thickness) + "mm 그대로입니다.";
+    } else {
+      cmp = " 자동 추천 <b>" + r.autoPick + "</b>(" + n1(r.autoThick) + "mm)보다 " +
+        (r.thickDiff > 0.02
+          ? "<b>" + n1(r.thickDiff) + "mm 두껍습니다</b>"
+          : (r.thickDiff < -0.02 ? "<b>" + n1(-r.thickDiff) + "mm 얇습니다</b>" : "두께 차이가 없습니다")) +
+        " (" + n1(r.autoThick) + " → " + n1(r.thickness) + "mm).";
+    }
+    return "<b>" + r.pick + "</b>을 직접 선택했습니다. 같은 도수·테 기준 " + tw + " 두께는 <b>" +
+      n1(r.thickness) + "mm</b>입니다." + cmp + " " + indexNote(r.pick);
   }
 
   /* ---------------- 렌더 ---------------- */
@@ -1327,11 +1497,45 @@
     $("#designVal").textContent = r.design;
     $("#designSub").textContent = r.designSub;
     $("#badge").textContent = badgeText(r);
+    $("#idxTag").textContent = r.manual ? "선택 굴절률" : "추천 굴절률";
+
+    // 굴절률 선택 카드
+    document.querySelectorAll('input[name="nidx"]').forEach(function (el) {
+      el.checked = (el.value === state.index);
+      var card = el.closest(".nidx");
+      if (card) card.classList.toggle("is-rec", el.value === r.autoPick);
+    });
+    ["auto", "1.56", "1.60", "1.67", "1.74"].forEach(function (k) {
+      var el = document.querySelector('[data-nmm="' + k + '"]');
+      if (!el) return;
+      el.textContent = (k === "auto" ? n1(r.autoThick) : n1(edgeThick(r.rmax, k, r.prof.mode, r.pow))) + "mm";
+    });
+    $("#nidxOut").innerHTML = r.pick + "<small>" + (r.manual ? "선택" : "추천") + "</small>";
+    var nidxHint = document.getElementById("nidxHint");
+    if (nidxHint) {
+      var tw2 = r.sph > 0 ? "중심" : "테두리";
+      var dx = r.thickDiff;
+      if (r.prof.mode === "plano") {
+        nidxHint.innerHTML = "도수가 0.00이라 굴절률을 바꿔도 두께는 <b>1.5mm</b>로 같습니다. 테 커브에 맞는 기본 렌즈면 충분합니다.";
+      } else if (!r.manual) {
+        nidxHint.innerHTML = "도수·테 기준 자동 추천은 <b>" + r.autoPick + "</b>입니다(" + tw2 + " <b>" + n1(r.autoThick) + "mm</b>). 다른 굴절률을 누르면 그 렌즈의 두께와 옆모습으로 바로 바뀝니다.";
+      } else if (r.pick === r.autoPick) {
+        nidxHint.innerHTML = "지금 선택은 자동 추천(<b>" + r.autoPick + "</b>)과 같습니다 — " + tw2 + " <b>" + n1(r.thickness) + "mm</b>.";
+      } else {
+        nidxHint.innerHTML = "지금 <b>" + r.pick + "</b> 직접 선택 — 자동 추천 <b>" + r.autoPick + "</b>(" + n1(r.autoThick) + "mm) 대비 " +
+          (dx > 0.02
+            ? "<b>+" + n1(dx) + "mm 두껍습니다</b>"
+            : (dx < -0.02 ? "<b>−" + n1(-dx) + "mm 얇습니다</b>" : "<b>두께 차이 없음</b>")) +
+          " (지금 " + tw2 + " " + n1(r.thickness) + "mm).";
+      }
+    }
 
     // 요약 문장
     var seTxt = fmt(r.se);
     var line;
-    if (r.sph > 0) {
+    if (r.manual) {
+      line = manualLine(r);
+    } else if (r.sph > 0) {
       line = "<b>" + yearLabel(r.sph) + "</b>(" + fmt(r.sph) + "D)입니다. 원시는 테두리가 아니라 <b>중심 두께</b>가 문제라, 얇은 렌즈보다 테 지름을 줄이는 쪽이 효과적입니다.";
     } else if (r.pick === "1.74") {
       var alt = (state.frame === "flat")
@@ -1379,7 +1583,10 @@
     var why = [];
     why.push("<b>등가도수 " + fmt(r.se) + "D · 최대 굴절력 " + fmt(r.sph + r.cyl) + "D</b> — " + yearLabel(r.sph) + " 구간입니다. 실제 두께는 등가도수가 아니라 가장 강한 경선(" + fmt(r.sph + r.cyl) + "D)이 결정하므로, 등가도수만 보면 두께를 과소평가하기 쉽습니다.");
     why.push("브릿지 18mm · PD " + r.pd + "mm → FPD <span class='num'>" + r.fpd + "mm</span> · 편심 <span class='num'>" + sgnTxt(r.dec, 1) + "mm</span>(" + (Math.abs(r.dec) < 0.05 ? "중심" : (r.dec > 0 ? "귀쪽" : "코쪽")) + ")라서 광학중심에서 가장 먼 가장자리가 <span class='num'>" + r.rmax.toFixed(1) + "mm</span>입니다. 같은 도수에서도 작은 테(44mm) 대비 두께가 약 <span class='num'>" + r.frameGain + "%</span> 늘어나며, 두께는 반지름의 <b>제곱</b>에 비례합니다.");
-    if (r.pick === "1.74") {
+    if (r.manual) {
+      why.push("<b>" + r.pick + " 직접 선택</b> — 자동 추천은 <b>" + r.autoPick + "</b>이었습니다. 같은 도수·테 기준 " + (r.sph > 0 ? "중심" : "테두리") + " 두께가 <span class='num'>" + n1(r.autoThick) + "mm → " + n1(r.thickness) + "mm</span>로 바뀝니다. 아래 설계 추천은 굴절률과 무관하게 도수·테로 정해집니다.");
+      why.push("<b>" + r.pick + "</b> 렌즈는 " + indexNote(r.pick) + (r.pick !== "1.56" && r.prof.mode !== "plano" ? " 1.56 대비 두께 약 <span class='num'>" + r.thinGain + "%</span> 얇습니다." : ""));
+    } else if (r.pick === "1.74") {
       why.push("<b>1.74</b>는 1.56 대비 두께 약 <span class='num'>" + r.thinGain + "%</span> 감소. 다만 비중이 커서 무게 감소는 두께만큼 크지 않고, 가격이 크게 뜁니다. 두께가 실제로 문제일 때만 선택하세요.");
     } else if (r.pick === "1.67") {
       var gain174 = round((1 - (1.561 - 1) / (INDEX["1.74"].n - 1)) * 100, 0);
@@ -1590,6 +1797,9 @@
     if (Math.abs(r.dec) >= 3) {
       items.push("<b>편심 " + sgnTxt(r.dec, 1) + "mm</b>: FPD(" + r.fpd + "mm)와 PD(" + r.pd + "mm) 차이가 큽니다. 광학중심을 " + Math.abs(r.dec).toFixed(1) + "mm " + (r.dec > 0 ? "귀쪽" : "코쪽") + "으로 옮겨야 해 렌즈 지름이 " + r.dia + "mm까지 커지고 테두리·무게가 늘어납니다. PD에 맞는 더 작은 테가 확실한 해법입니다.");
     }
+    if (r.manual && r.pick !== r.autoPick && r.prof.mode !== "plano" && r.thickDiff > 0.02) {
+      items.push("<b>" + r.pick + " 직접 선택</b>: 자동 추천(" + r.autoPick + ")보다 " + (r.sph > 0 ? "중심" : "테두리") + "가 " + n1(r.thickDiff) + "mm 두꺼워집니다. 메탈테에서는 림 밖 노출이 커지니 뿔테나 한 단계 작은 테를 함께 검토하세요.");
+    }
     if (!items.length) {
       items.push("특별한 제작 리스크는 낮은 조합입니다. 다만 실제 두께는 렌즈 블랭크 지름·가공 방식·테 형상에 따라 달라지니 매장에서 실물 샘플로 확인하세요.");
     }
@@ -1794,7 +2004,7 @@
 
     var intro = document.getElementById("cmpIntro");
     if (intro) {
-      intro.innerHTML = "브릿지 <b>18mm</b> · PD <b>" + state.pd + "mm</b> · 추천 " + r.pick + " 기준입니다. FPD = 렌즈 폭 + 18, d = (FPD − PD) ÷ 2.";
+      intro.innerHTML = "브릿지 <b>18mm</b> · PD <b>" + state.pd + "mm</b> · " + (r.manual ? "선택 " : "추천 ") + r.pick + " 기준입니다. FPD = 렌즈 폭 + 18, d = (FPD − PD) ÷ 2.";
     }
 
     var note = document.getElementById("cmpNote");
@@ -1842,6 +2052,12 @@
   document.querySelectorAll('input[name="size"]').forEach(function (el) {
     el.addEventListener("change", function () {
       if (this.checked) { state.size = this.value; render(); }
+    });
+  });
+
+  document.querySelectorAll('input[name="nidx"]').forEach(function (el) {
+    el.addEventListener("change", function () {
+      if (this.checked) { state.index = this.value; render(); }
     });
   });
 
@@ -1904,7 +2120,9 @@
       "도수: SPH " + fmt(r.sph) + " / CYL " + fmt(r.cyl) + " (SE " + fmt(r.se) + ", 최대 " + fmt(r.sph + r.cyl) + ")",
       "테: " + FRAMES[state.frame].label + " · " + SIZES[state.size].label + " (렌즈 폭 " + r.sizeA + "mm · PD " + r.pd + "mm)",
       "FPD " + r.fpd + "mm · 편심 " + sgnTxt(r.dec, 1) + "mm(" + (r.dec >= 0 ? "귀쪽" : "코쪽") + ") · 렌즈 지름 " + r.dia + "mm",
-      "추천: " + r.pick + " + " + r.design + " — " + r.designSub,
+      "굴절률: " + r.pick + (r.manual
+        ? " (직접 선택 · 자동 추천 " + r.autoPick + " 대비 " + (r.thickDiff > 0.02 ? "+" + n1(r.thickDiff) + "mm 두꺼움" : (r.thickDiff < -0.02 ? "−" + n1(-r.thickDiff) + "mm 얇음" : "동일")) + ")"
+        : " (자동 추천)") + " + " + r.design + " — " + r.designSub,
       "설계 단계: 4단계(구면<비구면<양면비구면<프리폼) 중 " + r.designStep + "단계",
       (r.sph > 0 ? "중심" : "테두리") + " 두께 추정(최대): 약 " + r.thickness.toFixed(1) + "mm",
       LAST_SIDE,
@@ -1934,12 +2152,13 @@
   }
 
   $("#resetBtn").addEventListener("click", function () {
-    state = { sph: DEFAULT.sph, cyl: DEFAULT.cyl, frame: DEFAULT.frame, size: DEFAULT.size, pd: DEFAULT.pd };
+    state = { sph: DEFAULT.sph, cyl: DEFAULT.cyl, frame: DEFAULT.frame, size: DEFAULT.size, pd: DEFAULT.pd, index: "auto" };
     sphEl.value = state.sph;
     cylEl.value = state.cyl;
     pdEl.value = state.pd;
     document.querySelector('input[name="frame"][value="normal"]').checked = true;
     document.querySelector('input[name="size"][value="medium"]').checked = true;
+    document.querySelector('input[name="nidx"][value="auto"]').checked = true;
     render();
     showToast("초기화했습니다");
   });
