@@ -740,45 +740,6 @@
         </div>
       </div>
 
-      <!-- 굴절률 선택 -->
-      <div class="field">
-        <div class="field-head">
-          <div>
-            <span class="label" id="nidxLabel">굴절률 선택</span>
-            <span class="label-sub">직접 고르면 그 렌즈 기준으로 두께·옆모습이 바뀝니다</span>
-          </div>
-          <output class="value-box" id="nidxOut">1.67<small>추천</small></output>
-        </div>
-        <div class="nidx-grid" role="radiogroup" aria-labelledby="nidxLabel">
-          <label class="nidx">
-            <input type="radio" name="nidx" value="auto" checked>
-            <span class="nx-name">자동 추천</span>
-            <span class="nx-mm" data-nmm="auto">5.1mm</span>
-          </label>
-          <label class="nidx">
-            <input type="radio" name="nidx" value="1.56">
-            <span class="nx-name">1.56</span>
-            <span class="nx-mm" data-nmm="1.56">5.9mm</span>
-          </label>
-          <label class="nidx">
-            <input type="radio" name="nidx" value="1.60">
-            <span class="nx-name">1.60</span>
-            <span class="nx-mm" data-nmm="1.60">5.6mm</span>
-          </label>
-          <label class="nidx">
-            <input type="radio" name="nidx" value="1.67">
-            <span class="nx-name">1.67</span>
-            <span class="nx-mm" data-nmm="1.67">5.1mm</span>
-          </label>
-          <label class="nidx">
-            <input type="radio" name="nidx" value="1.74">
-            <span class="nx-name">1.74</span>
-            <span class="nx-mm" data-nmm="1.74">4.7mm</span>
-          </label>
-        </div>
-        <p class="nidx-hint" id="nidxHint">도수·테 기준 자동 추천은 <b>1.67</b>입니다. 다른 굴절률을 누르면 두께와 옆모습이 바로 바뀝니다.</p>
-      </div>
-
       <!-- frame shape -->
       <div class="field">
         <div class="field-head">
@@ -895,6 +856,45 @@
           <button type="button" class="chip" data-bridge="21">21</button>
         </div>
         <p class="pd-hint">FPD = 렌즈 폭(A) + 브릿지. 브릿지가 넓을수록 FPD가 커져 PD와의 편심량 d도 커집니다. 안경 다리 안쪽에 <b>50□18</b>처럼 적힌 두 번째 숫자가 브릿지(mm)입니다.</p>
+      </div>
+
+      <!-- 굴절률 선택 -->
+      <div class="field">
+        <div class="field-head">
+          <div>
+            <span class="label" id="nidxLabel">굴절률 선택</span>
+            <span class="label-sub">직접 고르면 그 렌즈 기준으로 두께·옆모습이 바뀝니다</span>
+          </div>
+          <output class="value-box" id="nidxOut">1.67<small>추천</small></output>
+        </div>
+        <div class="nidx-grid" role="radiogroup" aria-labelledby="nidxLabel">
+          <label class="nidx">
+            <input type="radio" name="nidx" value="auto" checked>
+            <span class="nx-name">자동 추천</span>
+            <span class="nx-mm" data-nmm="auto">5.1mm</span>
+          </label>
+          <label class="nidx">
+            <input type="radio" name="nidx" value="1.56">
+            <span class="nx-name">1.56</span>
+            <span class="nx-mm" data-nmm="1.56">5.9mm</span>
+          </label>
+          <label class="nidx">
+            <input type="radio" name="nidx" value="1.60">
+            <span class="nx-name">1.60</span>
+            <span class="nx-mm" data-nmm="1.60">5.6mm</span>
+          </label>
+          <label class="nidx">
+            <input type="radio" name="nidx" value="1.67">
+            <span class="nx-name">1.67</span>
+            <span class="nx-mm" data-nmm="1.67">5.1mm</span>
+          </label>
+          <label class="nidx">
+            <input type="radio" name="nidx" value="1.74">
+            <span class="nx-name">1.74</span>
+            <span class="nx-mm" data-nmm="1.74">4.7mm</span>
+          </label>
+        </div>
+        <p class="nidx-hint" id="nidxHint">도수·테 기준 자동 추천은 <b>1.67</b>입니다. 다른 굴절률을 누르면 두께와 옆모습이 바로 바뀝니다.</p>
       </div>
     </section>
 
