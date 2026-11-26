@@ -2,6 +2,16 @@
 <html lang="ko">
 <head>
 <meta charset="utf-8">
+
+<!-- Google Analytics 4 (방문자 통계) -->
+<script async src="https://www.googletagmanager.com/gtag/js?id=G-XVW0LCDRR1"></script>
+<script>
+  window.dataLayer = window.dataLayer || [];
+  function gtag(){dataLayer.push(arguments);}
+  gtag('js', new Date());
+  gtag('config', 'G-XVW0LCDRR1');
+</script>
+
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
 <meta name="theme-color" content="#0b2b47">
 
@@ -582,6 +592,7 @@
   .site-footer{border-top:1px solid var(--line);background:#fff;padding:18px 0 26px}
   .site-footer p{margin:0;font-size:11px;line-height:1.65;color:var(--ink-3)}
   .site-footer p b{color:var(--ink-2)}
+  .site-footer .footer-ga{margin-top:6px;font-size:10.5px;color:var(--ink-3)}
 
   /* toast */
   .toast{
@@ -1185,6 +1196,7 @@
 <footer class="site-footer">
   <div class="wrap">
     <p><b>10초 렌즈 압축 &amp; 안경테 추천 계산기</b> · 참고용 도구입니다. 처방·조제는 반드시 안경원 검안 후 진행하세요. 두께 추정치는 렌즈 지름과 굴절률로 계산한 근사값이며 실제 제품과 차이가 있을 수 있습니다.</p>
+    <p class="footer-ga">방문자 수 확인을 위해 Google Analytics를 사용합니다(개인을 식별하는 정보는 보내지 않습니다).</p>
   </div>
 </footer>
 
@@ -2206,12 +2218,21 @@
     showToast("초기화했습니다");
   });
 
-  // 파트너 링크 미설정 시 이동 방지 (시안 상태)
+  // 파트너 링크 클릭 기록 (GA4) + 미설정 링크 이동 방지
   document.querySelectorAll(".p-card").forEach(function (a) {
     a.addEventListener("click", function (e) {
       if (this.getAttribute("href") === "#") {
         e.preventDefault();
         showToast("파트너스 링크를 넣으면 연결됩니다");
+        return;
+      }
+      if (typeof gtag === "function") {
+        var nameEl = this.querySelector(".p-name");
+        gtag("event", "coupang_click", {
+          link_url: this.href,
+          link_slot: this.getAttribute("data-slot") || "",
+          link_name: nameEl ? nameEl.textContent.trim() : ""
+        });
       }
     });
   });
