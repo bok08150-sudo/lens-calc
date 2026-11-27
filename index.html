@@ -856,7 +856,7 @@
             <button type="button" class="chip" data-pd="66">66</button>
             <button type="button" class="chip" data-pd="68">68</button>
           </div>
-          <p class="pd-hint">편심량 <b>d = (FPD − PD) ÷ 2</b>, FPD는 <b>렌즈 폭 + 브릿지 <span id="pdHintBridge">18mm</span></b>입니다. PD가 FPD보다 짧으면(d &gt; 0) 동공이 렌즈 기하학적 중심보다 코쪽에 있으므로 광학중심도 테 중심보다 <b>코쪽(비측)</b>으로 옮겨집니다. 그만큼 광학중심에서 멀어지는 <b>귀쪽(이측)</b> 가장자리가 근시렌즈에서 더 두꺼워지고, 원시렌즈는 광학중심에 가까운 코쪽 가장자리가 두꺼워집니다. PD가 FPD보다 길면 반대로 귀쪽 편심입니다.</p>
+          <p class="pd-hint">편심량 <b>d = (FPD − PD) ÷ 2</b>, FPD는 <b>렌즈 폭 + 브릿지 <span id="pdHintBridge">18mm</span></b>입니다. PD가 FPD보다 짧으면(d &gt; 0) 동공이 렌즈 기하학적 중심보다 코쪽에 있으므로 광학중심도 테 중심보다 <b>코쪽(비측)</b>으로 옮겨집니다. 그만큼 광학중심에서 멀어지는 <b>귀쪽(이측)</b> 가장자리가 근시렌즈에서 더 두꺼워지고, 원시렌즈는 광학중심에 가까운 코쪽 가장자리가 두꺼워집니다. PD가 FPD보다 길면 반대로 광학중심이 귀쪽(이측)으로 옮겨집니다.</p>
         </div>
       </div>
 
@@ -1622,7 +1622,7 @@
     $("#thickKey").textContent = (r.sph > 0 ? "중심 두께" : "테두리 두께 (최대)");
     $("#thickVal").innerHTML = r.thickness.toFixed(1) + "<small>mm</small>";
     $("#fpdVal").innerHTML = r.fpd + "<small>mm</small>";
-    $("#decKey").textContent = "편심량 d (" + (Math.abs(r.dec) < 0.05 ? "중심 일치" : (r.dec > 0 ? "코쪽(비측)" : "귀쪽(이측)")) + ")";
+    $("#decKey").textContent = "편심량 d (" + (Math.abs(r.dec) < 0.05 ? "중심 일치" : (r.dec > 0 ? "코쪽·비측" : "귀쪽·이측")) + ")";
     $("#decVal").innerHTML = sgnTxt(r.dec, 1) + "<small>mm</small>";
     $("#pdFormula").innerHTML = "브릿지 <b>" + r.bridge + "mm</b> · FPD = " + r.sizeA + "(A) + " + r.bridge + " = <b>" + r.fpd +
       "mm</b> · d = (" + r.fpd + " − " + r.pd + ") ÷ 2 = <b>" + sgnTxt(r.dec, 1) + "mm</b> → " +
