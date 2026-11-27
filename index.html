@@ -1637,7 +1637,7 @@
     // 왜 이 조합인가
     var why = [];
     why.push("<b>등가도수 " + fmt(r.se) + "D · 최대 굴절력 " + fmt(r.sph + r.cyl) + "D</b> — " + yearLabel(r.sph) + " 구간입니다. 실제 두께는 등가도수가 아니라 가장 강한 경선(" + fmt(r.sph + r.cyl) + "D)이 결정하므로, 등가도수만 보면 두께를 과소평가하기 쉽습니다.");
-    why.push("브릿지 " + r.bridge + "mm · PD " + r.pd + "mm → FPD <span class='num'>" + r.fpd + "mm</span> · 편심 <span class='num'>" + sgnTxt(r.dec, 1) + "mm</span>(" + (Math.abs(r.dec) < 0.05 ? "중심" : (r.dec > 0 ? "코쪽·비측" : "귀쪽·이측")) + ")라서 광학중심에서 가장 먼 가장자리가 <span class='num'>" + r.rmax.toFixed(1) + "mm</span>입니다. 같은 도수에서도 작은 테(44mm) 대비 두께가 약 <span class='num'>" + r.frameGain + "%</span> 늘어나며, 두께는 반지름의 <b>제곱</b>에 비례합니다.");
+    why.push("브릿지 " + r.bridge + "mm · PD " + r.pd + "mm → FPD <span class='num'>" + r.fpd + "mm</span> · 편심 <span class='num'>" + sgnTxt(r.dec, 1) + "mm</span>(" + (Math.abs(r.dec) < 0.05 ? "중심" : (r.dec > 0 ? "코쪽·비측" : "귀쪽·이측")) + ")라서 광학중심에서 가장 먼 가장자리까지 <span class='num'>" + r.rmax.toFixed(1) + "mm</span>(A/2 + |d|)가 필요합니다. 필요한 렌즈 지름이 커질수록 사지타도 커져, 같은 도수에서도 작은 테(44mm) 대비 " + (r.sph > 0 ? "중심 두께" : "테두리 두께") + "가 약 <span class='num'>" + r.frameGain + "%</span> 늘어납니다(두께는 반지름의 <b>제곱</b>에 비례).");
     if (r.manual) {
       why.push("<b>" + r.pick + " 직접 선택</b> — 자동 추천은 <b>" + r.autoPick + "</b>이었습니다. 같은 도수·테 기준 " + (r.sph > 0 ? "중심" : "테두리") + " 두께가 <span class='num'>" + n1(r.autoThick) + "mm → " + n1(r.thickness) + "mm</span>로 바뀝니다. 아래 설계 추천은 굴절률과 무관하게 도수·테로 정해집니다.");
       why.push("<b>" + r.pick + "</b> 렌즈는 " + indexNote(r.pick) + (r.pick !== "1.56" && r.prof.mode !== "plano" ? " 1.56 대비 두께 약 <span class='num'>" + r.thinGain + "%</span> 얇습니다." : ""));
